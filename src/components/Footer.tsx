@@ -1,7 +1,9 @@
 import { Eye, Mail, Phone, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export function Footer() {
+  const { t } = useLanguage();
   return (
     <footer className="bg-purple-950 border-t border-amber-500/20 text-amber-100 animate-fade-in">
       <div className="container mx-auto px-4 py-12">
@@ -19,16 +21,16 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-amber-400 mb-4">Navigation</h3>
+            <h3 className="font-semibold text-amber-400 mb-4">{t('Navigation')}</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link to="/" className="hover:text-amber-300 transition-colors">
-                  Accueil
+                  {t('Accueil')}
                 </Link>
               </li>
               <li>
                 <Link to="/packs" className="hover:text-amber-300 transition-colors">
-                  Nos Packs
+                  {t('Nos Packs')}
                 </Link>
               </li>
               <li>
@@ -40,7 +42,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-amber-400 mb-4">Services</h3>
+            <h3 className="font-semibold text-amber-400 mb-4">{t('Services')}</h3>
             <ul className="space-y-2 text-sm">
               <li>Voyance par téléphone</li>
               <li>Tarot et cartomancie</li>
@@ -50,7 +52,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-amber-400 mb-4">Contact</h3>
+            <h3 className="font-semibold text-amber-400 mb-4">{t('Contact')}</h3>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-amber-400" />

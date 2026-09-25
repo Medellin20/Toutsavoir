@@ -5,10 +5,12 @@ import { Home } from './pages/Home';
 import { Packs } from './pages/Packs';
 import { Payment } from './pages/Payment';
 import { Contact } from './pages/Contact';
+import { LanguageProvider } from './contexts/LanguageContext';
 
 function App() {
   return (
-    <BrowserRouter>
+    <LanguageProvider>
+      <BrowserRouter>
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <main className="flex-grow">
@@ -21,7 +23,8 @@ function App() {
         </main>
         <Footer />
       </div>
-    </BrowserRouter>
+      </BrowserRouter>
+    </LanguageProvider>
   );
 }
 

@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 import { Eye, Star, Sparkles, Moon, Heart } from 'lucide-react';
 import { testimonials } from '../data';
-import { LanguageTranslator } from '../components/LanguageTranslator';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export function Home() {
+  const { t } = useLanguage();
   const services = [
     {
       icon: Eye,
@@ -54,23 +55,15 @@ export function Home() {
                 to="/packs"
                 className="px-8 py-4 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-950 font-bold rounded-lg hover:from-amber-600 hover:to-yellow-600 transition-all transform hover:scale-105 shadow-lg hover:shadow-amber-500/50"
               >
-                Découvrir nos packs
+                {t('Découvrir nos packs')}
               </Link>
               <Link
                 to="/contact"
                 className="px-8 py-4 bg-purple-700/50 backdrop-blur-sm text-amber-100 font-bold rounded-lg hover:bg-purple-600/50 transition-all transform hover:scale-105 border border-amber-500/30"
               >
-                Consulter un voyant
+                {t('Consulter un voyant')}
               </Link>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="translator" className="py-16 bg-purple-950/50">
-        <div className="container mx-auto px-4">
-          <div className="max-w-5xl mx-auto">
-            <LanguageTranslator />
           </div>
         </div>
       </section>
@@ -79,7 +72,7 @@ export function Home() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 animate-fade-in-down">
             <Sparkles className="h-12 w-12 text-amber-400 mx-auto mb-4 animate-float" />
-            <h2 className="text-4xl font-bold text-amber-400 mb-4">Nos Services</h2>
+            <h2 className="text-4xl font-bold text-amber-400 mb-4">{t('Nos Services')}</h2>
             <p className="text-amber-100/80 text-lg">
               Une guidance spirituelle complète pour éclairer votre chemin
             </p>
@@ -105,7 +98,7 @@ export function Home() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 animate-fade-in-down">
             <Star className="h-12 w-12 text-amber-400 mx-auto mb-4 animate-float" />
-            <h2 className="text-4xl font-bold text-amber-400 mb-4">Témoignages</h2>
+            <h2 className="text-4xl font-bold text-amber-400 mb-4">{t('Témoignages')}</h2>
             <p className="text-amber-100/80 text-lg">
               Découvrez les expériences de nos clients satisfaits
             </p>

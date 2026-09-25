@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { Check, Sparkles } from 'lucide-react';
 import { packs, Pack } from '../data';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export function Packs() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const handleSelectPack = (pack: Pack) => {
@@ -14,7 +16,7 @@ export function Packs() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12 animate-fade-in-down">
           <Sparkles className="h-12 w-12 text-amber-400 mx-auto mb-4 animate-float" />
-          <h1 className="text-5xl font-bold text-amber-400 mb-4">Nos Packs</h1>
+          <h1 className="text-5xl font-bold text-amber-400 mb-4">{t('Nos Packs')}</h1>
           <p className="text-amber-100/80 text-xl max-w-2xl mx-auto">
             Choisissez le forfait qui vous correspond et commencez votre voyage spirituel
           </p>
@@ -34,7 +36,7 @@ export function Packs() {
                 {index === packs.length - 1 && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 animate-float">
                     <span className="bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-950 px-4 py-1 rounded-full text-sm font-bold shadow-lg shadow-amber-500/50">
-                      Le plus populaire
+                      {t('Le plus populaire')}
                     </span>
                 </div>
                 )}
@@ -67,7 +69,7 @@ export function Packs() {
                       : 'bg-purple-700/50 text-amber-100 hover:bg-purple-600/70 border border-amber-500/30'
                   }`}
                 >
-                  Choisir ce pack
+                  {t('Choisir ce pack')}
                 </button>
               </div>
             ))}
@@ -75,7 +77,7 @@ export function Packs() {
 
         <div className="mt-16 max-w-3xl mx-auto bg-gradient-to-br from-purple-800/60 to-indigo-900/60 backdrop-blur-sm p-8 rounded-2xl border border-amber-500/20 animate-fade-in-up animation-delay-400">
           <h2 className="text-2xl font-bold text-amber-400 mb-4 text-center">
-            Pourquoi choisir nos packs ?
+            {t('Pourquoi choisir nos packs ?')}
           </h2>
           <ul className="space-y-3 text-amber-100/80">
             <li className="flex items-start space-x-3">
