@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Eye, Star, Sparkles, Moon, Heart } from 'lucide-react';
 import { testimonials } from '../data';
+import { LanguageTranslator } from '../components/LanguageTranslator';
 
 export function Home() {
   const services = [
@@ -62,6 +63,14 @@ export function Home() {
                 Consulter un voyant
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="translator" className="py-16 bg-purple-950/50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            <LanguageTranslator />
           </div>
         </div>
       </section>

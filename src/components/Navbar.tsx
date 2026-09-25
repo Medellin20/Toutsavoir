@@ -20,6 +20,9 @@ export function Navbar() {
             <Link to="/packs" className="text-amber-100 hover:text-amber-300 transition-colors">
               Nos Packs
             </Link>
+            <Link to="/#translator" className="text-amber-100 hover:text-amber-300 transition-colors">
+              Traducteur
+            </Link>
             <Link to="/contact" className="text-amber-100 hover:text-amber-300 transition-colors">
               Contact
             </Link>
