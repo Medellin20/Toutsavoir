@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CreditCard, Building2, Check } from 'lucide-react';
 import { Pack } from '../data';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export function Payment() {
+  const { t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
   const pack = location.state?.pack as Pack;
@@ -32,9 +34,9 @@ export function Payment() {
             <div className="h-20 w-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <Check className="h-10 w-10 text-green-400" />
             </div>
-            <h2 className="text-3xl font-bold text-amber-400 mb-2">Demande enregistrée !</h2>
+            <h2 className="text-3xl font-bold text-amber-400 mb-2">{t('Demande enregistrée !')}</h2>
             <p className="text-amber-100/80">
-              Votre demande d'abonnement a été enregistrée. Vous allez être redirigé...
+              {t("Votre demande d'abonnement a été enregistrée. Vous allez être redirigé...")}
             </p>
           </div>
         </div>
@@ -46,38 +48,38 @@ export function Payment() {
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-purple-800 py-16 px-4">
       <div className="container mx-auto max-w-4xl">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-amber-400 mb-2">Paiement</h1>
-          <p className="text-amber-100/80">Finalisez votre abonnement</p>
+          <h1 className="text-4xl font-bold text-amber-400 mb-2">{t('Paiement')}</h1>
+          <p className="text-amber-100/80">{t('Finalisez votre abonnement')}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="bg-gradient-to-br from-purple-800/80 to-indigo-900/80 backdrop-blur-sm p-8 rounded-2xl border border-amber-500/20">
-            <h2 className="text-2xl font-bold text-amber-400 mb-6">Récapitulatif</h2>
+            <h2 className="text-2xl font-bold text-amber-400 mb-6">{t('Récapitulatif')}</h2>
 
             <div className="space-y-4 mb-6">
               <div className="flex justify-between items-center">
-                <span className="text-amber-100/80">Pack sélectionné:</span>
-                <span className="text-amber-300 font-semibold">{pack.name}</span>
+                <span className="text-amber-100/80">{t('Pack sélectionné:')}</span>
+                <span className="text-amber-300 font-semibold">{t(pack.name)}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-amber-100/80">Durée:</span>
-                <span className="text-amber-300 font-semibold">{pack.duration_months} mois</span>
+                <span className="text-amber-100/80">{t('Durée:')}</span>
+                <span className="text-amber-300 font-semibold">{pack.duration_months} {t('mois')}</span>
               </div>
               <div className="border-t border-amber-500/20 pt-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-amber-100/80 text-lg">Total:</span>
+                  <span className="text-amber-100/80 text-lg">{t('Total:')}</span>
                   <span className="text-amber-400 font-bold text-2xl">{pack.price}€</span>
                 </div>
               </div>
             </div>
 
             <div className="bg-purple-950/50 p-4 rounded-lg border border-amber-500/20">
-              <h3 className="text-amber-300 font-semibold mb-2">Inclus dans votre pack:</h3>
+              <h3 className="text-amber-300 font-semibold mb-2">{t('Inclus dans votre pack:')}</h3>
               <ul className="space-y-2">
                 {(pack.features as string[]).map((feature, idx) => (
                   <li key={idx} className="flex items-start space-x-2">
                     <Check className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
-                    <span className="text-amber-100/80 text-sm">{feature}</span>
+                    <span className="text-amber-100/80 text-sm">{t(feature)}</span>
                   </li>
                 ))}
               </ul>
@@ -85,7 +87,7 @@ export function Payment() {
           </div>
 
           <div className="bg-gradient-to-br from-purple-800/80 to-indigo-900/80 backdrop-blur-sm p-8 rounded-2xl border border-amber-500/20">
-            <h2 className="text-2xl font-bold text-amber-400 mb-6">Mode de paiement</h2>
+            <h2 className="text-2xl font-bold text-amber-400 mb-6">{t('Mode de paiement')}</h2>
 
             <div className="space-y-4 mb-8">
               <button
@@ -100,7 +102,7 @@ export function Payment() {
                   <CreditCard className="h-6 w-6 text-amber-400" />
                   <div className="text-left">
                     <div className="text-amber-300 font-semibold">PayPal</div>
-                    <div className="text-amber-100/60 text-sm">Paiement sécurisé</div>
+                    <div className="text-amber-100/60 text-sm">{t('Paiement sécurisé')}</div>
                   </div>
                 </div>
               </button>
@@ -116,8 +118,8 @@ export function Payment() {
                 <div className="flex items-center space-x-3">
                   <Building2 className="h-6 w-6 text-amber-400" />
                   <div className="text-left">
-                    <div className="text-amber-300 font-semibold">Virement bancaire</div>
-                    <div className="text-amber-100/60 text-sm">Par RIB</div>
+                    <div className="text-amber-300 font-semibold">{t('Virement bancaire')}</div>
+                    <div className="text-amber-100/60 text-sm">{t('Par RIB')}</div>
                   </div>
                 </div>
               </button>
@@ -125,10 +127,9 @@ export function Payment() {
 
             {paymentMethod === 'paypal' && (
               <div className="bg-purple-950/50 p-6 rounded-lg border border-amber-500/20 mb-6">
-                <h3 className="text-amber-300 font-semibold mb-3">Paiement PayPal</h3>
+                <h3 className="text-amber-300 font-semibold mb-3">{t('Paiement PayPal')}</h3>
                 <p className="text-amber-100/70 text-sm mb-4">
-                  Vous allez être redirigé vers PayPal pour effectuer votre paiement de manière
-                  sécurisée.
+                  {t('Vous allez être redirigé vers PayPal pour effectuer votre paiement de manière sécurisée.')}
                 </p>
                 <a
                   href={`https://www.paypal.com/paypalme/mysticvision/${pack.price}`}
@@ -136,7 +137,7 @@ export function Payment() {
                   rel="noopener noreferrer"
                   className="block w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all text-center"
                 >
-                  Payer avec PayPal
+                  {t('Payer avec PayPal')}
                 </a>
               </div>
             )}
@@ -144,11 +145,11 @@ export function Payment() {
             {paymentMethod === 'rib' && (
               <div className="bg-purple-950/50 p-6 rounded-lg border border-amber-500/20 mb-6">
                 <h3 className="text-amber-300 font-semibold mb-3">
-                  Informations de virement bancaire
+                  {t('Informations de virement bancaire')}
                 </h3>
                 <div className="space-y-2 text-sm">
                   <div>
-                    <span className="text-amber-100/60">Titulaire:</span>
+                    <span className="text-amber-100/60">{t('Titulaire')}:</span>
                     <span className="text-amber-300 ml-2">Mystic Vision SARL</span>
                   </div>
                   <div>
@@ -160,19 +161,18 @@ export function Payment() {
                     <span className="text-amber-300 ml-2">ABCDEFGH</span>
                   </div>
                   <div>
-                    <span className="text-amber-100/60">Montant:</span>
+                    <span className="text-amber-100/60">{t('Montant')}:</span>
                     <span className="text-amber-300 ml-2">{pack.price}€</span>
                   </div>
                   <div>
-                    <span className="text-amber-100/60">Référence:</span>
+                    <span className="text-amber-100/60">{t('Référence')}:</span>
                     <span className="text-amber-300 ml-2">
                       {pack.name.replace(/\s+/g, '-').toUpperCase()}
                     </span>
                   </div>
                 </div>
                 <p className="text-amber-100/60 text-xs mt-4">
-                  Veuillez inclure la référence dans votre virement. Votre abonnement sera activé
-                  sous 48h après réception du paiement.
+                  {t('Veuillez inclure la référence dans votre virement. Votre abonnement sera activé sous 48h après réception du paiement.')}
                 </p>
               </div>
             )}
@@ -185,15 +185,15 @@ export function Payment() {
               {loading ? (
                 <span className="flex items-center justify-center">
                   <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-purple-950 mr-2"></div>
-                  Enregistrement...
+                  {t('Enregistrement...')}
                 </span>
               ) : (
-                'Confirmer la demande'
+                t('Confirmer la demande')
               )}
             </button>
 
             <p className="text-amber-100/50 text-xs text-center mt-4">
-              En continuant, vous acceptez nos conditions générales de vente
+              {t('En continuant, vous acceptez nos conditions générales de vente')}
             </p>
           </div>
         </div>

@@ -8,23 +8,23 @@ export function Home() {
   const services = [
     {
       icon: Eye,
-      title: 'Voyance Claire',
-      description: 'Découvrez votre avenir avec clarté grâce à nos voyants expérimentés.',
+      title: t('Voyance Claire'),
+      description: t('Découvrez votre avenir avec clarté grâce à nos voyants expérimentés.'),
     },
     {
       icon: Star,
-      title: 'Tarot & Cartomancie',
-      description: 'Laissez les cartes révéler les secrets de votre destinée.',
+      title: t('Tarot & Cartomancie'),
+      description: t('Laissez les cartes révéler les secrets de votre destinée.'),
     },
     {
       icon: Moon,
-      title: 'Astrologie',
-      description: 'Explorez l\'influence des astres sur votre vie quotidienne.',
+      title: t('Astrologie'),
+      description: t("Explorez l'influence des astres sur votre vie quotidienne."),
     },
     {
       icon: Heart,
-      title: 'Guidance Amoureuse',
-      description: 'Trouvez des réponses à vos questions sentimentales.',
+      title: t('Guidance Amoureuse'),
+      description: t('Trouvez des réponses à vos questions sentimentales.'),
     },
   ];
 
@@ -48,7 +48,7 @@ export function Home() {
               Mystic Vision
             </h1>
             <p className="text-xl md:text-2xl text-amber-100 mb-8 leading-relaxed animate-fade-in-up animation-delay-200">
-              Découvrez les mystères de votre destinée avec nos voyants professionnels
+              {t('Découvrez les mystères de votre destinée avec nos voyants professionnels')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animation-delay-400">
               <Link
@@ -74,7 +74,7 @@ export function Home() {
             <Sparkles className="h-12 w-12 text-amber-400 mx-auto mb-4 animate-float" />
             <h2 className="text-4xl font-bold text-amber-400 mb-4">{t('Nos Services')}</h2>
             <p className="text-amber-100/80 text-lg">
-              Une guidance spirituelle complète pour éclairer votre chemin
+              {t('Une guidance spirituelle complète pour éclairer votre chemin')}
             </p>
           </div>
 
@@ -100,7 +100,7 @@ export function Home() {
             <Star className="h-12 w-12 text-amber-400 mx-auto mb-4 animate-float" />
             <h2 className="text-4xl font-bold text-amber-400 mb-4">{t('Témoignages')}</h2>
             <p className="text-amber-100/80 text-lg">
-              Découvrez les expériences de nos clients satisfaits
+              {t('Découvrez les expériences de nos clients satisfaits')}
             </p>
           </div>
 
@@ -116,7 +116,7 @@ export function Home() {
                       <Star key={i} className="h-5 w-5 text-amber-400 fill-amber-400 animate-twinkle" style={{ animationDelay: `${i * 0.2}s` }} />
                     ))}
                   </div>
-                  <p className="text-amber-100/90 mb-4 italic">"{testimonial.content}"</p>
+                  <p className="text-amber-100/90 mb-4 italic">"{t(testimonial.content)}"</p>
                   <p className="text-amber-400 font-semibold">{testimonial.author_name}</p>
                 </div>
               ))}

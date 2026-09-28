@@ -18,7 +18,7 @@ export function Packs() {
           <Sparkles className="h-12 w-12 text-amber-400 mx-auto mb-4 animate-float" />
           <h1 className="text-5xl font-bold text-amber-400 mb-4">{t('Nos Packs')}</h1>
           <p className="text-amber-100/80 text-xl max-w-2xl mx-auto">
-            Choisissez le forfait qui vous correspond et commencez votre voyage spirituel
+            {t('Choisissez le forfait qui vous correspond et commencez votre voyage spirituel')}
           </p>
         </div>
 
@@ -42,13 +42,13 @@ export function Packs() {
                 )}
 
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-amber-300 mb-2">{pack.name}</h3>
-                  <p className="text-amber-100/70 text-sm mb-4">{pack.description}</p>
+                  <h3 className="text-2xl font-bold text-amber-300 mb-2">{t(pack.name)}</h3>
+                  <p className="text-amber-100/70 text-sm mb-4">{t(pack.description)}</p>
                   <div className="flex items-baseline justify-center mb-2">
                     <span className="text-5xl font-bold text-amber-400">{pack.price}€</span>
                   </div>
                   <p className="text-amber-200/60 text-sm">
-                    pour {pack.duration_months} mois
+                    {t('pour')} {pack.duration_months} {t('mois')}
                   </p>
                 </div>
 
@@ -56,7 +56,7 @@ export function Packs() {
                   {(pack.features as string[]).map((feature, idx) => (
                     <li key={idx} className="flex items-start space-x-2">
                       <Check className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-amber-100/80 text-sm">{feature}</span>
+                      <span className="text-amber-100/80 text-sm">{t(feature)}</span>
                     </li>
                   ))}
                 </ul>
@@ -82,19 +82,19 @@ export function Packs() {
           <ul className="space-y-3 text-amber-100/80">
             <li className="flex items-start space-x-3">
               <Check className="h-6 w-6 text-amber-400 flex-shrink-0" />
-              <span>Voyants professionnels et certifiés avec des années d'expérience</span>
+              <span>{t("Voyants professionnels et certifiés avec des années d'expérience")}</span>
             </li>
             <li className="flex items-start space-x-3">
               <Check className="h-6 w-6 text-amber-400 flex-shrink-0" />
-              <span>Consultations personnalisées adaptées à vos besoins spécifiques</span>
+              <span>{t('Consultations personnalisées adaptées à vos besoins spécifiques')}</span>
             </li>
             <li className="flex items-start space-x-3">
               <Check className="h-6 w-6 text-amber-400 flex-shrink-0" />
-              <span>Disponibilité flexible pour s'adapter à votre emploi du temps</span>
+              <span>{t("Disponibilité flexible pour s'adapter à votre emploi du temps")}</span>
             </li>
             <li className="flex items-start space-x-3">
               <Check className="h-6 w-6 text-amber-400 flex-shrink-0" />
-              <span>Confidentialité absolue et écoute bienveillante garanties</span>
+              <span>{t('Confidentialité absolue et écoute bienveillante garanties')}</span>
             </li>
           </ul>
         </div>

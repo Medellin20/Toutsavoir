@@ -35,12 +35,12 @@ export function Navbar() {
             </Link>
             <label className="flex items-center gap-1 rounded-full border border-amber-500/30 bg-purple-900/70 px-3 py-2 text-amber-100">
               <span aria-hidden="true">🌐</span>
-              <span className="sr-only">Traduire</span>
+              <span className="sr-only">{t('Traducteur')}</span>
               <select
                 value={language}
                 onChange={(event) => setLanguage(event.target.value as Language)}
                 className="cursor-pointer bg-transparent text-sm outline-none"
-                aria-label="Choisir la langue du site"
+                aria-label={t('Choisir la langue du site')}
               >
                 {languages.map((item) => (
                   <option key={item.code} value={item.code} className="bg-purple-950">

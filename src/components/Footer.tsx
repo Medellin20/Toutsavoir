@@ -16,7 +16,7 @@ export function Footer() {
               </span>
             </div>
             <p className="text-sm text-amber-200/70">
-              Votre guide spirituel pour éclairer votre chemin de vie. Découvrez votre destinée avec nos voyants professionnels.
+              {t('Votre guide spirituel pour éclairer votre chemin de vie. Découvrez votre destinée avec nos voyants professionnels.')}
             </p>
           </div>
 
@@ -35,7 +35,7 @@ export function Footer() {
               </li>
               <li>
                 <Link to="/contact" className="hover:text-amber-300 transition-colors">
-                  Contact
+                  {t('Contact')}
                 </Link>
               </li>
             </ul>
@@ -44,10 +44,10 @@ export function Footer() {
           <div>
             <h3 className="font-semibold text-amber-400 mb-4">{t('Services')}</h3>
             <ul className="space-y-2 text-sm">
-              <li>Voyance par téléphone</li>
-              <li>Tarot et cartomancie</li>
-              <li>Médiumnité</li>
-              <li>Astrologie</li>
+              <li>{t('Voyance par téléphone')}</li>
+              <li>{t('Tarot et cartomancie')}</li>
+              <li>{t('Médiumnité')}</li>
+              <li>{t('Astrologie')}</li>
             </ul>
           </div>
 
@@ -71,7 +71,7 @@ export function Footer() {
         </div>
 
         <div className="mt-8 pt-8 border-t border-amber-500/20 text-center text-sm text-amber-200/70">
-          <p>&copy; {new Date().getFullYear()} Mystic Vision. Tous droits réservés.</p>
+          <p>&copy; {new Date().getFullYear()} Mystic Vision. {t('Tous droits réservés.')}</p>
         </div>
       </div>
     </footer>

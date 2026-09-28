@@ -1,6 +1,8 @@
 import { MessageCircle, Mail, Phone, MapPin, Send, Headphones } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export function Contact() {
+  const { t } = useLanguage();
   const voyants = [
     {
       name: 'Madame Luna',
@@ -34,15 +36,15 @@ export function Contact() {
 
   const handleWhatsApp = (phone: string, name: string) => {
     const message = encodeURIComponent(
-      `Bonjour ${name}, je souhaiterais une consultation de voyance.`
+      t('Bonjour {name}, je souhaiterais une consultation de voyance.').replace('{name}', name)
     );
     window.open(`https://wa.me/${phone.replace(/\+/g, '')}?text=${message}`, '_blank');
   };
 
   const handleEmail = (email: string, name: string) => {
-    const subject = encodeURIComponent('Demande de consultation');
+    const subject = encodeURIComponent(t('Demande de consultation'));
     const body = encodeURIComponent(
-      `Bonjour ${name},\n\nJe souhaiterais prendre rendez-vous pour une consultation de voyance.\n\nCordialement`
+      t('Bonjour {name},\n\nJe souhaiterais prendre rendez-vous pour une consultation de voyance.\n\nCordialement').replace('{name}', name)
     );
     window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
   };
@@ -56,9 +58,9 @@ export function Contact() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12 animate-fade-in-down">
           <MessageCircle className="h-12 w-12 text-amber-400 mx-auto mb-4 animate-float" />
-          <h1 className="text-5xl font-bold text-amber-400 mb-4">Contactez-nous</h1>
+          <h1 className="text-5xl font-bold text-amber-400 mb-4">{t('Contactez-nous')}</h1>
           <p className="text-amber-100/80 text-xl max-w-2xl mx-auto">
-            Nos voyants sont à votre écoute pour vous guider sur votre chemin spirituel
+            {t('Nos voyants sont à votre écoute pour vous guider sur votre chemin spirituel')}
           </p>
         </div>
 
@@ -70,14 +72,14 @@ export function Contact() {
                   <Headphones className="h-8 w-8 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-amber-400 mb-2">{customerService.name}</h3>
-                  <p className="text-amber-100/80 mb-4">{customerService.description}</p>
+                  <h3 className="text-2xl font-bold text-amber-400 mb-2">{t(customerService.name)}</h3>
+                  <p className="text-amber-100/80 mb-4">{t(customerService.description)}</p>
                   <div className="space-y-2 mb-4">
                     <div className="text-sm text-amber-200/70">
-                      <span className="font-semibold text-amber-300">Lun-Ven:</span> {customerService.hours.weekday}
+                      <span className="font-semibold text-amber-300">{t('Lun-Ven:')}</span> {customerService.hours.weekday}
                     </div>
                     <div className="text-sm text-amber-200/70">
-                      <span className="font-semibold text-amber-300">Sam-Dim:</span> {customerService.hours.weekend}
+                      <span className="font-semibold text-amber-300">{t('Sam-Dim:')}</span> {customerService.hours.weekend}
                     </div>
                   </div>
                   <button
@@ -85,40 +87,40 @@ export function Contact() {
                     className="w-full flex items-center justify-center space-x-2 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all transform hover:scale-105 font-semibold"
                   >
                     <Headphones className="h-5 w-5" />
-                    <span>Appeler: {customerService.phone}</span>
+                    <span>{t('Appeler:')} {customerService.phone}</span>
                   </button>
                 </div>
               </div>
             </div>
 
             <div className="bg-gradient-to-br from-purple-800/80 to-indigo-900/80 backdrop-blur-sm p-8 rounded-2xl border border-amber-500/20 animate-slide-in-right animation-delay-200">
-              <h3 className="text-2xl font-bold text-amber-400 mb-4 text-center">Avantages du Service Clientèle</h3>
+              <h3 className="text-2xl font-bold text-amber-400 mb-4 text-center">{t('Avantages du Service Clientèle')}</h3>
               <ul className="space-y-3 text-amber-100/80 text-sm">
                 <li className="flex items-start space-x-2">
                   <span className="text-amber-400 font-bold mt-1">✓</span>
-                  <span>Support immédiat et personnalisé</span>
+                  <span>{t('Support immédiat et personnalisé')}</span>
                 </li>
                 <li className="flex items-start space-x-2">
                   <span className="text-amber-400 font-bold mt-1">✓</span>
-                  <span>Réponses à vos questions techniques et commerciales</span>
+                  <span>{t('Réponses à vos questions techniques et commerciales')}</span>
                 </li>
                 <li className="flex items-start space-x-2">
                   <span className="text-amber-400 font-bold mt-1">✓</span>
-                  <span>Assistance pour votre inscription et vos packs</span>
+                  <span>{t('Assistance pour votre inscription et vos packs')}</span>
                 </li>
                 <li className="flex items-start space-x-2">
                   <span className="text-amber-400 font-bold mt-1">✓</span>
-                  <span>Communication confidentielle et bienveillante</span>
+                  <span>{t('Communication confidentielle et bienveillante')}</span>
                 </li>
                 <li className="flex items-start space-x-2">
                   <span className="text-amber-400 font-bold mt-1">✓</span>
-                  <span>Disponibilité étendue jusqu'à 22h en semaine</span>
+                  <span>{t("Disponibilité étendue jusqu'à 22h en semaine")}</span>
                 </li>
               </ul>
             </div>
           </div>
 
-          <h2 className="text-3xl font-bold text-amber-400 mb-8 text-center animate-fade-in-up">Nos Voyants</h2>
+          <h2 className="text-3xl font-bold text-amber-400 mb-8 text-center animate-fade-in-up">{t('Nos Voyants')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {voyants.map((voyant, index) => (
               <div
@@ -133,7 +135,7 @@ export function Contact() {
                     </span>
                   </div>
                   <h3 className="text-xl font-bold text-amber-300 mb-1">{voyant.name}</h3>
-                  <p className="text-amber-100/70 text-sm">{voyant.specialty}</p>
+                  <p className="text-amber-100/70 text-sm">{t(voyant.specialty)}</p>
                 </div>
 
                 <div className="space-y-3">
@@ -150,7 +152,7 @@ export function Contact() {
                     className="w-full flex items-center justify-center space-x-2 py-3 bg-purple-700 text-amber-100 rounded-lg hover:bg-purple-600 transition-all transform hover:scale-105 border border-amber-500/30"
                   >
                     <Mail className="h-5 w-5" />
-                    <span>Email</span>
+                    <span>{t('Email')}</span>
                   </button>
                 </div>
               </div>
@@ -160,31 +162,31 @@ export function Contact() {
 
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="bg-gradient-to-br from-purple-800/80 to-indigo-900/80 backdrop-blur-sm p-8 rounded-2xl border border-amber-500/20 animate-slide-in-left">
-            <h2 className="text-2xl font-bold text-amber-400 mb-6">Nos Coordonnées</h2>
+            <h2 className="text-2xl font-bold text-amber-400 mb-6">{t('Nos Coordonnées')}</h2>
 
             <div className="space-y-4">
               <div className="flex items-start space-x-3">
                 <Phone className="h-6 w-6 text-amber-400 flex-shrink-0 mt-1" />
                 <div>
-                  <div className="text-amber-300 font-semibold">Téléphone</div>
+                  <div className="text-amber-300 font-semibold">{t('Téléphone')}</div>
                   <div className="text-amber-100/80">+33 1 23 45 67 89</div>
-                  <div className="text-amber-100/60 text-sm">Lun-Dim: 9h-21h</div>
+                  <div className="text-amber-100/60 text-sm">{t('Lun-Dim:')} 9h-21h</div>
                 </div>
               </div>
 
               <div className="flex items-start space-x-3">
                 <Mail className="h-6 w-6 text-amber-400 flex-shrink-0 mt-1" />
                 <div>
-                  <div className="text-amber-300 font-semibold">Email</div>
+                  <div className="text-amber-300 font-semibold">{t('Email')}</div>
                   <div className="text-amber-100/80">contact@mysticvision.fr</div>
-                  <div className="text-amber-100/60 text-sm">Réponse sous 24h</div>
+                  <div className="text-amber-100/60 text-sm">{t('Réponse sous 24h')}</div>
                 </div>
               </div>
 
               <div className="flex items-start space-x-3">
                 <MapPin className="h-6 w-6 text-amber-400 flex-shrink-0 mt-1" />
                 <div>
-                  <div className="text-amber-300 font-semibold">Adresse</div>
+                  <div className="text-amber-300 font-semibold">{t('Adresse')}</div>
                   <div className="text-amber-100/80">123 Rue de la Spiritualité</div>
                   <div className="text-amber-100/80">75001 Paris, France</div>
                 </div>
@@ -193,20 +195,20 @@ export function Contact() {
           </div>
 
           <div className="bg-gradient-to-br from-purple-800/80 to-indigo-900/80 backdrop-blur-sm p-8 rounded-2xl border border-amber-500/20 animate-slide-in-right animation-delay-200">
-            <h2 className="text-2xl font-bold text-amber-400 mb-6">Envoyez-nous un message</h2>
+            <h2 className="text-2xl font-bold text-amber-400 mb-6">{t('Envoyez-nous un message')}</h2>
 
             <form className="space-y-4">
               <div>
-                <label className="block text-amber-300 mb-2 text-sm font-semibold">Nom</label>
+                <label className="block text-amber-300 mb-2 text-sm font-semibold">{t('Nom')}</label>
                 <input
                   type="text"
                   className="w-full px-4 py-3 bg-purple-950/50 border border-amber-500/30 rounded-lg text-amber-100 placeholder-amber-300/30 focus:outline-none focus:border-amber-500 transition-colors"
-                  placeholder="Votre nom"
+                  placeholder={t('Votre nom')}
                 />
               </div>
 
               <div>
-                <label className="block text-amber-300 mb-2 text-sm font-semibold">Email</label>
+                <label className="block text-amber-300 mb-2 text-sm font-semibold">{t('Email')}</label>
                 <input
                   type="email"
                   className="w-full px-4 py-3 bg-purple-950/50 border border-amber-500/30 rounded-lg text-amber-100 placeholder-amber-300/30 focus:outline-none focus:border-amber-500 transition-colors"
@@ -215,11 +217,11 @@ export function Contact() {
               </div>
 
               <div>
-                <label className="block text-amber-300 mb-2 text-sm font-semibold">Message</label>
+                <label className="block text-amber-300 mb-2 text-sm font-semibold">{t('Message')}</label>
                 <textarea
                   rows={4}
                   className="w-full px-4 py-3 bg-purple-950/50 border border-amber-500/30 rounded-lg text-amber-100 placeholder-amber-300/30 focus:outline-none focus:border-amber-500 transition-colors resize-none"
-                  placeholder="Votre message..."
+                  placeholder={t('Votre message...')}
                 ></textarea>
               </div>
 
@@ -228,21 +230,21 @@ export function Contact() {
                 className="w-full flex items-center justify-center space-x-2 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-950 font-bold rounded-lg hover:from-amber-600 hover:to-yellow-600 transition-all transform hover:scale-105 shadow-lg hover:shadow-amber-500/50"
               >
                 <Send className="h-5 w-5" />
-                <span>Envoyer</span>
+                <span>{t('Envoyer')}</span>
               </button>
             </form>
           </div>
         </div>
 
         <div className="max-w-4xl mx-auto mt-12 bg-gradient-to-br from-purple-800/60 to-indigo-900/60 backdrop-blur-sm p-8 rounded-2xl border border-amber-500/20 text-center animate-fade-in-up animation-delay-400">
-          <h2 className="text-2xl font-bold text-amber-400 mb-4">Horaires d'ouverture</h2>
+          <h2 className="text-2xl font-bold text-amber-400 mb-4">{t('Horaires d’ouverture')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-amber-100/80">
             <div>
-              <div className="font-semibold text-amber-300">Lundi - Vendredi</div>
+              <div className="font-semibold text-amber-300">{t('Lundi - Vendredi')}</div>
               <div>9h00 - 21h00</div>
             </div>
             <div>
-              <div className="font-semibold text-amber-300">Samedi - Dimanche</div>
+              <div className="font-semibold text-amber-300">{t('Samedi - Dimanche')}</div>
               <div>10h00 - 20h00</div>
             </div>
           </div>
