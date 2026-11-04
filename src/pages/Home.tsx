@@ -1,32 +1,11 @@
 import { Link } from 'react-router-dom';
-import { Eye, Star, Sparkles, Moon, Heart } from 'lucide-react';
-import { testimonials } from '../data';
+import { Eye, Star, Sparkles, Moon, Heart, Briefcase, Feather, ArrowRight } from 'lucide-react';
+import { testimonials, services } from '../data';
 import { useLanguage } from '../contexts/LanguageContext';
 
 export function Home() {
   const { t } = useLanguage();
-  const services = [
-    {
-      icon: Eye,
-      title: t('Voyance Claire'),
-      description: t('Découvrez votre avenir avec clarté grâce à nos voyants expérimentés.'),
-    },
-    {
-      icon: Star,
-      title: t('Tarot & Cartomancie'),
-      description: t('Laissez les cartes révéler les secrets de votre destinée.'),
-    },
-    {
-      icon: Moon,
-      title: t('Astrologie'),
-      description: t("Explorez l'influence des astres sur votre vie quotidienne."),
-    },
-    {
-      icon: Heart,
-      title: t('Guidance Amoureuse'),
-      description: t('Trouvez des réponses à vos questions sentimentales.'),
-    },
-  ];
+  const serviceIcons = [Feather, Heart, Briefcase, Star, Eye, Moon];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-purple-800 animate-gradient-shift">
@@ -52,10 +31,10 @@ export function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animation-delay-400">
               <Link
-                to="/packs"
+                to="/#services"
                 className="px-8 py-4 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-950 font-bold rounded-lg hover:from-amber-600 hover:to-yellow-600 transition-all transform hover:scale-105 shadow-lg hover:shadow-amber-500/50"
               >
-                {t('Découvrir nos packs')}
+                {t('Nos Services')}
               </Link>
               <Link
                 to="/contact"
@@ -68,28 +47,36 @@ export function Home() {
         </div>
       </section>
 
-      <section className="py-16 bg-purple-950/50">
+      <section id="services" className="py-16 bg-purple-950/50 scroll-mt-24" aria-labelledby="services-title">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 animate-fade-in-down">
             <Sparkles className="h-12 w-12 text-amber-400 mx-auto mb-4 animate-float" />
-            <h2 className="text-4xl font-bold text-amber-400 mb-4">{t('Nos Services')}</h2>
+            <h2 id="services-title" className="text-4xl font-bold text-amber-400 mb-4">{t('Nos Services')}</h2>
             <p className="text-amber-100/80 text-lg">
               {t('Une guidance spirituelle complète pour éclairer votre chemin')}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {services.map((service, index) => (
-              <div
-                key={index}
-                className="bg-gradient-to-br from-purple-800/80 to-indigo-900/80 backdrop-blur-sm p-6 rounded-xl border border-amber-500/20 hover:border-amber-500/50 transition-all transform hover:scale-105 hover:shadow-xl hover:shadow-amber-500/20 animate-fade-in-up"
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {services.map((service, index) => {
+              const Icon = serviceIcons[index];
+              return (
+              <Link
+                to={`/consultation/${service.id}`}
+                key={service.id}
+                className="group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-400 flex flex-col bg-gradient-to-br from-purple-800/80 to-indigo-900/80 backdrop-blur-sm p-6 rounded-xl border border-amber-500/20 hover:border-amber-500/50 transition-all transform hover:scale-105 hover:shadow-xl hover:shadow-amber-500/20 animate-fade-in-up"
                 style={{ animationDelay: `${index * 0.15}s` }}
               >
-                <service.icon className="h-12 w-12 text-amber-400 mb-4 transition-transform duration-300 group-hover:scale-110" />
-                <h3 className="text-xl font-bold text-amber-300 mb-2">{service.title}</h3>
-                <p className="text-amber-100/70">{service.description}</p>
-              </div>
-            ))}
+                <Icon aria-hidden="true" className="h-12 w-12 text-amber-400 mb-4 transition-transform duration-300 group-hover:scale-110" />
+                <h3 className="text-xl font-bold text-amber-300 mb-2">{t(service.title)}</h3>
+                <p className="text-amber-100/80 leading-relaxed mb-6">{t(service.description)}</p>
+                <span className="mt-auto inline-flex items-center gap-2 text-amber-300 font-semibold">
+                  {t('Consulter un voyant')}
+                  <ArrowRight aria-hidden="true" className="h-4 w-4 rtl:rotate-180" />
+                </span>
+              </Link>
+            );
+            })}
           </div>
         </div>
       </section>

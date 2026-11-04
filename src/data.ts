@@ -1,53 +1,9 @@
-export interface Pack {
-  id: string;
-  name: string;
-  duration_months: number;
-  price: number;
-  description: string;
-  features: string[];
-}
-
 export interface Testimonial {
   id: string;
   author_name: string;
   content: string;
   rating: number;
 }
-
-export const packs: Pack[] = [
-  {
-    id: 'decouverte',
-    name: 'Découverte',
-    duration_months: 1,
-    price: 29,
-    description: 'Une première guidance pour éclairer votre chemin.',
-    features: ['Une consultation personnalisée', 'Réponse sous 48 heures', 'Support par email'],
-  },
-  {
-    id: 'serenite',
-    name: 'Sérénité',
-    duration_months: 3,
-    price: 69,
-    description: 'Un accompagnement régulier pour avancer sereinement.',
-    features: ['Trois consultations personnalisées', 'Réponse prioritaire', 'Suivi personnalisé'],
-  },
-  {
-    id: 'intuition',
-    name: 'Intuition',
-    duration_months: 6,
-    price: 119,
-    description: 'Une guidance approfondie au fil des saisons.',
-    features: ['Six consultations personnalisées', 'Disponibilité prioritaire', 'Conseils illimités par email'],
-  },
-  {
-    id: 'destinee',
-    name: 'Destinée',
-    duration_months: 12,
-    price: 199,
-    description: 'L’accompagnement complet pour toute votre année.',
-    features: ['Douze consultations personnalisées', 'Accès prioritaire permanent', 'Bilan mensuel personnalisé'],
-  },
-];
 
 export const testimonials: Testimonial[] = [
   {
@@ -67,5 +23,38 @@ export const testimonials: Testimonial[] = [
     author_name: 'Camille',
     content: 'Les réponses apportées m’ont aidée à voir les choses plus clairement.',
     rating: 5,
+  },
+];
+
+export const services = [
+  {
+    id: 'mediumnite',
+    title: 'Contact avec les défunts',
+    description: 'Consultations de médiumnité permettant aux utilisateurs d’explorer symboliquement les liens spirituels avec leurs proches disparus, dans un cadre respectueux et bienveillant.',
+  },
+  {
+    id: 'amour',
+    title: 'Mariage et avenir amoureux',
+    description: 'Consultations sentimentales consacrées à l’amour, aux relations de couple, aux projets de mariage, à la compatibilité amoureuse et aux perspectives sentimentales.',
+  },
+  {
+    id: 'carriere',
+    title: 'Avenir financier et professionnel',
+    description: 'Consultations de voyance portant sur les perspectives financières, les opportunités professionnelles, la carrière, les projets et les choix de vie.',
+  },
+  {
+    id: 'tarot',
+    title: 'Lecture du tarot',
+    description: 'Séances de tirage et d’interprétation des cartes du tarot pour explorer les questions liées à l’amour, au travail, aux finances, aux décisions personnelles et aux perspectives d’avenir.',
+  },
+  {
+    id: 'voyance',
+    title: 'Voyance Claire',
+    description: 'Découvrez votre avenir avec clarté grâce à nos voyants expérimentés.',
+  },
+  {
+    id: 'astrologie',
+    title: 'Astrologie',
+    description: "Explorez l'influence des astres sur votre vie quotidienne.",
   },
 ];

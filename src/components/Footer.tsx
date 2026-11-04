@@ -1,5 +1,6 @@
 import { Eye, Mail, Phone, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { services } from '../data';
 import { useLanguage } from '../contexts/LanguageContext';
 
 export function Footer() {
@@ -11,7 +12,7 @@ export function Footer() {
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <Eye className="h-8 w-8 text-amber-400 animate-glow" />
-              <span className="text-xl font-bold bg-gradient-to-r from-amber-400 to-yellow-300 bg-clip-text text-transparent">
+              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-amber-400 to-yellow-300 bg-clip-text text-transparent">
                 Mystic Vision
               </span>
             </div>
@@ -29,8 +30,8 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/packs" className="hover:text-amber-300 transition-colors">
-                  {t('Nos Packs')}
+                <Link to="/#services" className="hover:text-amber-300 transition-colors">
+                  {t('Nos Services')}
                 </Link>
               </li>
               <li>
@@ -44,10 +45,13 @@ export function Footer() {
           <div>
             <h3 className="font-semibold text-amber-400 mb-4">{t('Services')}</h3>
             <ul className="space-y-2 text-sm">
-              <li>{t('Voyance par téléphone')}</li>
-              <li>{t('Tarot et cartomancie')}</li>
-              <li>{t('Médiumnité')}</li>
-              <li>{t('Astrologie')}</li>
+              {services.map((service) => (
+                <li key={service.id}>
+                  <Link to={`/consultation/${service.id}`} className="hover:text-amber-300 transition-colors">
+                    {t(service.title)}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 

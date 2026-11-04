@@ -106,7 +106,7 @@ export function Contact() {
                 </li>
                 <li className="flex items-start space-x-2">
                   <span className="text-amber-400 font-bold mt-1">✓</span>
-                  <span>{t('Assistance pour votre inscription et vos packs')}</span>
+                  <span>{t('Assistance pour préparer votre consultation')}</span>
                 </li>
                 <li className="flex items-start space-x-2">
                   <span className="text-amber-400 font-bold mt-1">✓</span>
