@@ -8,9 +8,12 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json"
+    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
+    "admin:setup": "node scripts/setup-admin.mjs",
+    "test:api": "node --import tsx --test server/api.test.ts"
   },
   "dependencies": {
+    "@netlify/blobs": "^11.1.7",
     "axios": "^1.13.2",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",
@@ -19,6 +22,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
+    "@types/node": "^26.6.6",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.7.0",
@@ -29,6 +33,7 @@
     "globals": "^15.9.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.18",
+    "tsx": "^4.23.15",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.3.0",
     "vite": "^5.4.21"

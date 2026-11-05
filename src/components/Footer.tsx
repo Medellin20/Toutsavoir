@@ -1,11 +1,13 @@
+import { useProfile } from '../contexts/ProfileContext';
 import { brand } from '../brand';
-import { Eye, Mail, Phone, MapPin } from 'lucide-react';
+import { Eye, Mail, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { services } from '../data';
 import { useLanguage } from '../contexts/LanguageContext';
 
 export function Footer() {
   const { t } = useLanguage();
+  const { profile, error } = useProfile();
   return (
     <footer className="bg-midnight border-t border-gold/20 text-lavender animate-fade-in">
       <div className="container mx-auto px-4 py-12">
@@ -58,20 +60,12 @@ export function Footer() {
 
           <div>
             <h3 className="font-semibold text-gold mb-4">{t('Contact')}</h3>
-            <ul className="space-y-2 text-sm">
-              <li className="flex items-center space-x-2">
-                <Mail className="h-4 w-4 text-gold" />
-                <span>{brand.email}</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <Phone className="h-4 w-4 text-gold" />
-                <span>+33 1 23 45 67 89</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <MapPin className="h-4 w-4 text-gold" />
-                <span>Paris, France</span>
-              </li>
-            </ul>
+            {!error && <ul className="space-y-2 text-sm">
+              <li className="text-gold font-semibold">{profile.name}</li>
+              {profile.email && <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-gold shrink-0" /><a className="break-all" href={`mailto:${profile.email}`}>{profile.email}</a></li>}
+              {profile.phone && <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-gold shrink-0" /><a href={`tel:${profile.phone.replace(/[^+\d]/g, '')}`}>{profile.phone}</a></li>}
+            </ul>}
+            <Link to="/admin" className="inline-block text-sm mt-4 hover:text-gold">{t('Espace admin')}</Link>
           </div>
         </div>
 

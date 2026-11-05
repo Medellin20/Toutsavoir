@@ -4,6 +4,8 @@ import { Footer } from './components/Footer';
 import { Home } from './pages/Home';
 import { Consultation } from './pages/Consultation';
 import { useEffect } from 'react';
+import { Admin } from './pages/Admin';
+import { ProfileProvider } from './contexts/ProfileContext';
 import { Contact } from './pages/Contact';
 import { LanguageProvider } from './contexts/LanguageContext';
 
@@ -19,6 +21,7 @@ function ScrollToPage() {
 function App() {
   return (
     <LanguageProvider>
+      <ProfileProvider>
       <BrowserRouter>
       <div className="min-h-screen flex flex-col">
         <ScrollToPage />
@@ -30,11 +33,13 @@ function App() {
             <Route path="/packs" element={<Navigate to="/#services" replace />} />
             <Route path="/payment" element={<Navigate to="/#services" replace />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/admin" element={<Admin />} />
           </Routes>
         </main>
         <Footer />
       </div>
       </BrowserRouter>
+      </ProfileProvider>
     </LanguageProvider>
   );
 }

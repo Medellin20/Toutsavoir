@@ -25,3 +25,6 @@ Thumbs.db
 
 # TypeScript build metadata
 *.tsbuildinfo
+
+# Private local server storage
+.oryalune-data/

@@ -1,12 +1,12 @@
 import { brand } from '../brand';
 import { Link } from 'react-router-dom';
-import { Eye, Star, Sparkles, Moon, Heart, Briefcase, Feather, ArrowRight } from 'lucide-react';
+import { Baby, Eye, Star, Sparkles, Moon, Heart, Briefcase, Feather, ArrowRight } from 'lucide-react';
 import { testimonials, services } from '../data';
 import { useLanguage } from '../contexts/LanguageContext';
 
 export function Home() {
   const { t } = useLanguage();
-  const serviceIcons = [Feather, Heart, Briefcase, Star, Eye, Moon];
+  const serviceIcons = [Baby, Feather, Heart, Briefcase, Star, Eye, Moon];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-midnight via-midnight to-royal animate-gradient-shift">
@@ -70,7 +70,7 @@ export function Home() {
               >
                 <Icon aria-hidden="true" className="h-12 w-12 text-gold mb-4 transition-transform duration-300 group-hover:scale-110" />
                 <h3 className="text-xl font-bold text-gold mb-2">{t(service.title)}</h3>
-                <p className="text-lavender leading-relaxed mb-6">{t(service.description)}</p>
+                <p className="text-lavender whitespace-pre-line leading-relaxed mb-6">{t(service.description)}</p>
                 <span className="mt-auto inline-flex items-center gap-2 text-gold font-semibold">
                   {t('Consulter un voyant')}
                   <ArrowRight aria-hidden="true" className="h-4 w-4 rtl:rotate-180" />
@@ -99,13 +99,10 @@ export function Home() {
                   className="bg-gradient-to-br from-royal/60 to-midnight/60 backdrop-blur-sm p-6 rounded-xl border border-gold/20 hover:border-gold/40 transition-all animate-fade-in-up"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <div className="flex items-center mb-3">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 text-gold fill-gold animate-twinkle" style={{ animationDelay: `${i * 0.2}s` }} />
-                    ))}
-                  </div>
-                  <p className="text-lavender mb-4 italic">"{t(testimonial.content)}"</p>
+                  <p className="text-gold text-sm mb-3">{t(testimonial.service)}</p>
+                  <blockquote className="text-lavender mb-4 italic">« {t(testimonial.content)} »</blockquote>
                   <p className="text-gold font-semibold">{testimonial.author_name}</p>
+                  <p className="text-lavender text-sm mt-1">{testimonial.location}</p>
                 </div>
               ))}
           </div>

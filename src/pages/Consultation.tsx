@@ -1,12 +1,11 @@
-import { brand } from '../brand';
+import { saveConsultation } from '../api';
 import { useRef, useState, type FormEvent } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Mail } from 'lucide-react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { services } from '../data';
 import { commonQuestions, serviceQuestions, closingQuestions } from '../consultation-data';
 import { useLanguage } from '../contexts/LanguageContext';
 
-const recipient = brand.email;
 const inputClass = 'w-full rounded-lg border border-gold/30 bg-midnight/60 px-4 py-3 text-lavender focus:outline-none focus:ring-2 focus:ring-gold';
 
 export function Consultation() {
@@ -23,10 +22,14 @@ export function Consultation() {
 }
 
 function ConsultationForm({ service }: { service: (typeof services)[number] }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const navigate = useNavigate();
+  const requestId = useRef(crypto.randomUUID());
+  const submitting = useRef(false);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [review, setReview] = useState(false);
-  const [emailOpened, setEmailOpened] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
   const heading = useRef<HTMLHeadingElement>(null);
   const questions = [...commonQuestions, ...serviceQuestions[service.id], ...closingQuestions];
   const identity = [
@@ -37,8 +40,6 @@ function ConsultationForm({ service }: { service: (typeof services)[number] }) {
   ];
   const update = (id: string, value: string) => setAnswers((previous) => ({ ...previous, [id]: value }));
   const fields = [...identity, ...questions];
-  const body = `${brand.name} — ${t('Demande de consultation')} : ${t(service.title)}\n\n${fields.map((field) => `${t(field.label)}\n${answers[field.id]?.trim() ? t(answers[field.id].trim()) : '—'}`).join('\n\n')}`;
-  const emailUrl = `mailto:${recipient}?subject=${encodeURIComponent(`${brand.name} — ${t('Demande de consultation')} — ${t(service.title)}`)}&body=${encodeURIComponent(body)}`;
 
   function showReview(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -46,13 +47,18 @@ function ConsultationForm({ service }: { service: (typeof services)[number] }) {
     requestAnimationFrame(() => heading.current?.focus());
   }
 
-  function download() {
-    const url = URL.createObjectURL(new Blob([body], { type: 'text/plain;charset=utf-8' }));
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `oryalune-consultation-${service.id}.txt`;
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  async function submit() {
+    if (submitting.current) return;
+    submitting.current = true;
+    setSaving(true);
+    setError('');
+    try {
+      const result = await saveConsultation({ id: requestId.current, serviceId: service.id, language, answers });
+      if (!result.saved) throw new Error('L’enregistrement n’a pas été confirmé. Veuillez réessayer.');
+      navigate('/contact', { replace: true, state: { consultationSaved: true } });
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Impossible d’enregistrer la demande. Veuillez réessayer.');
+    } finally { submitting.current = false; setSaving(false); }
   }
 
   return (
@@ -63,7 +69,7 @@ function ConsultationForm({ service }: { service: (typeof services)[number] }) {
         </Link>
         <p className="text-gold mb-3 text-sm">{t(review ? 'Étape 2 sur 2 · Récapitulatif' : 'Étape 1 sur 2 · Votre consultation')}</p>
         <h1 ref={heading} tabIndex={-1} className="text-3xl sm:text-4xl font-bold text-gold mb-4 focus:outline-none">{t(service.title)}</h1>
-        <p className="text-lavender leading-relaxed mb-8">{t(service.description)}</p>
+        <p className="text-lavender whitespace-pre-line leading-relaxed mb-8">{t(service.description)}</p>
         {review ? (
           <section aria-label={t('Récapitulatif')} className="bg-midnight/50 border border-gold/20 p-5 sm:p-8 rounded-2xl">
             <h2 className="text-2xl font-bold text-gold mb-6">{t('Vérifiez vos réponses')}</h2>
@@ -72,13 +78,12 @@ function ConsultationForm({ service }: { service: (typeof services)[number] }) {
                 <div key={field.id}><dt className="text-gold font-semibold mb-1">{t(field.label)}</dt><dd className="text-lavender whitespace-pre-wrap break-words">{t(answers[field.id])}</dd></div>
               ))}
             </dl>
-            <p className="text-sm text-lavender my-6">{t('Le bouton ouvre votre messagerie avec les réponses préparées. Envoyez ensuite le message pour transmettre votre demande.')} <span className="break-all">{recipient}</span></p>
+            <p className="text-sm text-lavender my-6">{t('Votre demande sera enregistrée. Vous pourrez ensuite contacter votre voyante.')}</p>
+            {error && <p role="alert" className="border border-gold/50 rounded-lg p-4 my-4">{t(error)}</p>}
             <div className="flex flex-col sm:flex-row gap-3">
-              <button type="button" onClick={() => { setReview(false); setEmailOpened(false); }} className="border border-gold/40 rounded-lg px-5 py-3 text-lavender">{t('Modifier mes réponses')}</button>
-              <a href={emailUrl} onClick={() => setEmailOpened(true)} className="inline-flex justify-center items-center gap-2 rounded-lg bg-orchid text-lavender font-bold px-5 py-3 hover:bg-royal"><Mail aria-hidden="true" className="h-5 w-5" />{t('Préparer l’e-mail')}</a>
+              <button type="button" disabled={saving} onClick={() => setReview(false)} className="border border-gold/40 rounded-lg px-5 py-3 text-lavender disabled:opacity-50">{t('Modifier mes réponses')}</button>
+              <button type="button" disabled={saving} onClick={() => void submit()} className="inline-flex justify-center items-center gap-2 rounded-lg bg-orchid text-lavender font-bold px-5 py-3 hover:bg-royal disabled:opacity-50"><Check aria-hidden="true" className="h-5 w-5" />{t(saving ? 'Enregistrement...' : 'Enregistrer et contacter ma voyante')}</button>
             </div>
-            {emailOpened && <p role="status" className="text-lavender mt-5">{t('Votre demande sera transmise uniquement après l’envoi depuis votre messagerie.')}</p>}
-            <button type="button" onClick={download} className="text-gold underline underline-offset-4 mt-5 text-sm">{t('Télécharger mes réponses')}</button>
           </section>
         ) : (
           <form onSubmit={showReview} className="bg-midnight/50 border border-gold/20 p-5 sm:p-8 rounded-2xl space-y-8">

@@ -13,6 +13,11 @@ export const commonQuestions: Question[] = [
 ];
 
 export const serviceQuestions: Record<string, Question[]> = {
+  parentalite: [
+    { id: 'familyProject', label: 'Quel projet de parentalité souhaitez-vous explorer ?' },
+    { id: 'parenthoodQuestions', label: 'Quelles interrogations avez-vous sur votre chemin vers la parentalité ?' },
+    { id: 'aspirations', label: 'Quelles sont vos aspirations pour votre avenir familial ?' },
+  ],
   mediumnite: [
     { id: 'connection', label: 'Avez-vous perdu un proche avec qui vous aimeriez « garder le lien » ?' },
     { id: 'family', label: 'Y a-t-il des tensions ou des non-dits dans votre famille ?' },

@@ -1,0 +1,23 @@
+export interface VoyantProfile {
+  name: string;
+  description: string;
+  phone: string;
+  whatsapp: string;
+  email: string;
+  hours: string;
+}
+export interface ConsultationRecord {
+  id: string;
+  serviceId: string;
+  createdAt: string;
+  language: string;
+  answers: Record<string, string>;
+}
+export const defaultProfile: VoyantProfile = {
+  name: 'Madame Luna',
+  description: 'Une seule voyante vous accompagne pour tous les services Oryalune.',
+  phone: '',
+  whatsapp: '',
+  email: 'kartersteven215@gmail.com',
+  hours: '',
+};
