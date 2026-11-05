@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f1f5ef"/>
+  <circle cx="1050" cy="50" r="300" fill="#e3ebe0"/>
+  <circle cx="80" cy="630" r="230" fill="#e3ebe0"/>
+  <circle cx="600" cy="160" r="52" fill="#3f593f"/>
+  <path d="M568 160q32-42 64 0-32 42-64 0Z" fill="none" stroke="#faf8f2" stroke-width="4"/>
+  <circle cx="600" cy="160" r="11" fill="#d9c9a3"/>
+  <text x="600" y="325" text-anchor="middle" fill="#314633" font-family="Georgia,serif" font-size="100">Oryalune</text>
+  <path d="M530 370h140" stroke="#806536" stroke-width="2"/>
+  <text x="600" y="435" text-anchor="middle" fill="#3f593f" font-family="Arial,sans-serif" font-size="32">Un espace pour éclairer votre chemin</text>
+</svg>
