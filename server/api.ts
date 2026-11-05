@@ -1,7 +1,7 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { services } from '../src/data';
 import { commonQuestions, serviceQuestions, closingQuestions } from '../src/consultation-data';
-import { defaultProfile, type ConsultationRecord, type VoyantProfile } from '../src/platform-types';
+import { defaultProfile, type ConsultationRecord, type FeedbackRecord, type VoyantProfile } from '../src/platform-types';
 
 export interface Storage {
   get<T>(key: string): Promise<T | null>;
@@ -47,6 +47,18 @@ function validateConsultation(data: Record<string, unknown>): ConsultationRecord
   return { id, serviceId, language, answers, createdAt: new Date().toISOString() };
 }
 
+function validateFeedback(data: Record<string, unknown>): FeedbackRecord {
+  const id = requireText(data.id, 36, true);
+  if (!/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(id)) throw new HttpError(400, 'Identifiant invalide.');
+  if (data.kind !== 'review' && data.kind !== 'suggestion') throw new HttpError(400, 'Type de message invalide.');
+  const name = requireText(data.name, 80, true);
+  const email = requireText(data.email ?? '', 254);
+  const message = requireText(data.message, 3000, true);
+  if (email && !emailPattern.test(email)) throw new HttpError(400, 'Adresse e-mail invalide.');
+  if (data.kind === 'review' && (typeof data.rating !== 'number' || !Number.isInteger(data.rating) || data.rating < 1 || data.rating > 5)) throw new HttpError(400, 'Choisissez une note de 1 à 5.');
+  return { id, kind: data.kind, name, email, message, rating: data.kind === 'review' ? data.rating as number : null, createdAt: new Date().toISOString() };
+}
+
 export function createApi(store: Storage, options: { password: () => string | undefined; secure: boolean }) {
   const cookie = (token: string, maxAge = 28800) => `oryalune_admin=${token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${options.secure ? '; Secure' : ''}`;
   return async (request: Request, clientIp = 'unknown'): Promise<Response> => {
@@ -77,8 +89,17 @@ export function createApi(store: Storage, options: { password: () => string | un
         await store.set(key, existing ?? entry);
         return json({ saved: true }, 201);
       }
+      if (path === '/feedback' && request.method === 'POST') {
+        const entry = validateFeedback(await readBody());
+        const key = `feedback/${entry.id}`;
+        const existing = await store.get<FeedbackRecord>(key);
+        if (existing && ['kind', 'name', 'email', 'message', 'rating'].some(field => existing[field as keyof FeedbackRecord] !== entry[field as keyof FeedbackRecord])) throw new HttpError(409, 'Ce message existe déjà.');
+        await store.set(key, existing ?? entry);
+        return json({ saved: true }, 201);
+      }
       const password = options.password();
-      if (!password || password.length < 12 || password.length > 256) throw new HttpError(503, 'L’accès admin doit être configuré sur le serveur.');
+      if (!password) throw new HttpError(503, 'Accès admin indisponible : configurez ORYALUNE_ADMIN_PASSWORD dans les variables serveur de l’hébergement, puis redéployez le site.');
+      if (password.length < 12 || password.length > 256) throw new HttpError(503, 'Configuration admin invalide : ORYALUNE_ADMIN_PASSWORD doit contenir entre 12 et 256 caractères. Corrigez la variable serveur, puis redéployez le site.');
       if (path === '/admin/login' && request.method === 'POST') {
         const key = `login-attempts/${hash(clientIp)}`;
         const attempts = await store.get<{ count: number; until: number }>(key);
@@ -107,6 +128,11 @@ export function createApi(store: Storage, options: { password: () => string | un
       if (path === '/admin/consultations' && request.method === 'GET') {
         const keys = (await store.list('consultations/')).sort().reverse();
         const records = await Promise.all(keys.map(key => store.get<ConsultationRecord>(key)));
+        return json(records.filter(Boolean).sort((a, b) => b!.createdAt.localeCompare(a!.createdAt)));
+      }
+      if (path === '/admin/feedback' && request.method === 'GET') {
+        const keys = await store.list('feedback/');
+        const records = await Promise.all(keys.map(key => store.get<FeedbackRecord>(key)));
         return json(records.filter(Boolean).sort((a, b) => b!.createdAt.localeCompare(a!.createdAt)));
       }
       if (path === '/admin/profile' && request.method === 'PUT') {

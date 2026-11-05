@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
+import { Feedback } from './pages/Feedback';
 import { Home } from './pages/Home';
 import { Consultation } from './pages/Consultation';
 import { useEffect } from 'react';
@@ -33,6 +34,7 @@ function App() {
             <Route path="/packs" element={<Navigate to="/#services" replace />} />
             <Route path="/payment" element={<Navigate to="/#services" replace />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/avis" element={<Feedback />} />
             <Route path="/admin" element={<Admin />} />
           </Routes>
         </main>

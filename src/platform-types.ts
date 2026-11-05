@@ -21,3 +21,13 @@ export const defaultProfile: VoyantProfile = {
   email: 'kartersteven215@gmail.com',
   hours: '',
 };
+
+export interface FeedbackRecord {
+  id: string;
+  kind: 'review' | 'suggestion';
+  name: string;
+  email: string;
+  message: string;
+  rating: number | null;
+  createdAt: string;
+}

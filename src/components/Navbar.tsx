@@ -34,6 +34,7 @@ export function Navbar() {
             <Link to="/contact" className="text-lavender hover:text-gold transition-colors">
               {t('Contact')}
             </Link>
+            <Link to="/avis" className="text-lavender hover:text-gold transition-colors">{t('Avis et suggestions')}</Link>
             <label className="flex items-center gap-1 rounded-full border border-gold/30 bg-midnight/70 px-3 py-2 text-lavender">
               <span aria-hidden="true">🌐</span>
               <span className="sr-only">{t('Traducteur')}</span>

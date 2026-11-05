@@ -8,7 +8,7 @@ import { createApi, type Storage } from './api';
 import { localStore } from './local-store';
 import { services } from '../src/data';
 import { commonQuestions, serviceQuestions, closingQuestions } from '../src/consultation-data';
-import { defaultProfile, type ConsultationRecord } from '../src/platform-types';
+import { defaultProfile, type ConsultationRecord, type FeedbackRecord } from '../src/platform-types';
 
 const origin = 'http://localhost:5173';
 function request(path: string, method = 'GET', body?: unknown, cookie?: string, requestOrigin = origin) {
@@ -170,5 +170,76 @@ test('une panne pendant la sauvegarde admin conserve le profil précédent', asy
     assert.equal(response.status, 503);
     assert.ok((await response.json()).error);
     assert.deepEqual(await store.get('profile'), defaultProfile);
+  } finally { await rm(directory, { recursive: true, force: true }); }
+});
+
+
+test('configuration admin absente ou invalide : diagnostic explicite sans ouvrir les accès', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'oryalune-config-'));
+  try {
+    for (const password of [undefined, 'x'.repeat(10), 'x'.repeat(257)]) {
+      const handle = createApi(localStore(directory), { password: () => password, secure: true });
+      for (const req of [request('/admin/session'), request('/admin/login', 'POST', { password: 'test' })]) {
+        const response = await handle(req);
+        assert.equal(response.status, 503);
+        assert.equal(response.headers.get('set-cookie'), null);
+        const { error } = await response.json();
+        assert.match(error, /ORYALUNE_ADMIN_PASSWORD/);
+        if (password) assert.match(error, /12 et 256/);
+      }
+    }
+  } finally { await rm(directory, { recursive: true, force: true }); }
+});
+
+
+test('avis et suggestions : conservation, confidentialité et tentatives sans doublons', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'oryalune-feedback-'));
+  const password = randomBytes(24).toString('hex');
+  const store = localStore(directory);
+  let handle = createApi(store, { password: () => password, secure: false });
+  try {
+    const review = { id: randomUUID(), kind: 'review', name: 'Visiteur', email: 'test@example.com', rating: 4, message: "Très bonne écoute.\nMerci pour l’échange !" };
+    const suggestion = { id: randomUUID(), kind: 'suggestion', name: 'Anonyme', email: '', rating: null, message: 'Proposer davantage de créneaux.' };
+    for (const data of [review, suggestion, review]) {
+      const response = await handle(request('/feedback', 'POST', data));
+      assert.equal(response.status, 201);
+      assert.deepEqual(await response.json(), { saved: true });
+    }
+    assert.equal((await store.list('feedback/')).length, 2);
+    assert.equal((await handle(request('/feedback', 'POST', { ...review, message: 'Autre texte' }))).status, 409);
+    assert.equal((await handle(request('/admin/feedback'))).status, 401);
+    assert.equal((await handle(request('/feedback'))).status, 401);
+    handle = createApi(localStore(directory), { password: () => password, secure: false });
+    const login = await handle(request('/admin/login', 'POST', { password }));
+    const cookie = login.headers.get('set-cookie')!.split(';')[0];
+    const response = await handle(request('/admin/feedback', 'GET', undefined, cookie));
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get('cache-control'), 'no-store');
+    const records = await response.json() as FeedbackRecord[];
+    assert.equal(records.length, 2);
+    for (const expected of [review, suggestion]) {
+      const record = records.find(item => item.id === expected.id)!;
+      const { createdAt, ...data } = record;
+      assert.ok(Number.isFinite(Date.parse(createdAt)));
+      assert.deepEqual(data, expected);
+    }
+  } finally { await rm(directory, { recursive: true, force: true }); }
+});
+
+test('avis et suggestions : validation et refus des fausses confirmations', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'oryalune-feedback-validation-'));
+  const store = localStore(directory);
+  const handle = createApi(store, { password: () => undefined, secure: false });
+  const valid = { id: randomUUID(), kind: 'review', name: 'Test', email: '', rating: 5, message: 'Mon expérience' };
+  try {
+    for (const invalid of [{ id: '../profile' }, { kind: 'other' }, { name: '  ' }, { email: 'incorrect' }, { message: '  ' }, { message: 'x'.repeat(3001) }, { rating: 0 }, { rating: 6 }, { rating: 2.5 }, { rating: '5' }]) {
+      assert.equal((await handle(request('/feedback', 'POST', { ...valid, ...invalid }))).status, 400);
+    }
+    assert.equal((await handle(request('/feedback', 'POST', valid, undefined, 'https://attacker.example'))).status, 403);
+    assert.equal((await store.list('feedback/')).length, 0);
+    const failing = createApi({ ...store, set: async () => { throw new Error('Storage offline'); } }, { password: () => undefined, secure: false });
+    const response = await failing(request('/feedback', 'POST', valid));
+    assert.equal(response.status, 503);
+    assert.equal((await response.json()).saved, undefined);
   } finally { await rm(directory, { recursive: true, force: true }); }
 });

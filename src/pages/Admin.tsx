@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Lock, LogOut, RefreshCw, Save, Inbox } from 'lucide-react';
 import { api, ApiError } from '../api';
 import { useProfile } from '../contexts/ProfileContext';
-import { defaultProfile, type ConsultationRecord, type VoyantProfile } from '../platform-types';
+import { defaultProfile, type ConsultationRecord, type FeedbackRecord, type VoyantProfile } from '../platform-types';
 import { services } from '../data';
 import { commonQuestions, serviceQuestions, closingQuestions } from '../consultation-data';
 
@@ -20,11 +20,12 @@ export function Admin() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [feedback, setFeedback] = useState<FeedbackRecord[]>([]);
   const [entries, setEntries] = useState<ConsultationRecord[]>([]);
   const [profileDraft, setProfileDraft] = useState(defaultProfile);
   const [selected, setSelected] = useState<string | null>(null);
   const [search, setSearch] = useState('');
-  const [tab, setTab] = useState<'requests' | 'profile'>('requests');
+  const [tab, setTab] = useState<'requests' | 'profile' | 'feedback'>('requests');
   const [visibleCount, setVisibleCount] = useState(20);
 
   useEffect(() => {
@@ -32,8 +33,8 @@ export function Admin() {
     (async () => {
       try {
         await api('/admin/session');
-        const [records, contact] = await Promise.all([api<ConsultationRecord[]>('/admin/consultations'), api<VoyantProfile>('/profile')]);
-        if (active) { setEntries(records); setProfileDraft(contact); setAuthenticated(true); }
+        const [records, contact, messages] = await Promise.all([api<ConsultationRecord[]>('/admin/consultations'), api<VoyantProfile>('/profile'), api<FeedbackRecord[]>('/admin/feedback')]);
+        if (active) { setEntries(records); setFeedback(messages); setProfileDraft(contact); setAuthenticated(true); }
       } catch (caught) {
         if (active && (!(caught instanceof ApiError) || caught.status !== 401)) setError(caught instanceof Error ? caught.message : 'Chargement impossible.');
       } finally { if (active) setChecking(false); }
@@ -42,7 +43,7 @@ export function Admin() {
   }, []);
 
   function report(caught: unknown) {
-    if (caught instanceof ApiError && caught.status === 401) { setAuthenticated(false); setEntries([]); setSelected(null); }
+    if (caught instanceof ApiError && caught.status === 401) { setAuthenticated(false); setEntries([]); setFeedback([]); setSelected(null); }
     setError(caught instanceof Error ? caught.message : 'Une erreur est survenue.');
   }
   async function login(event: FormEvent) {
@@ -50,20 +51,23 @@ export function Admin() {
     try {
       await api('/admin/login', { method: 'POST', body: JSON.stringify({ password }) });
       setPassword('');
-      const [records, contact] = await Promise.all([api<ConsultationRecord[]>('/admin/consultations'), api<VoyantProfile>('/profile')]);
-      setEntries(records); setProfileDraft(contact); setAuthenticated(true);
+      const [records, contact, messages] = await Promise.all([api<ConsultationRecord[]>('/admin/consultations'), api<VoyantProfile>('/profile'), api<FeedbackRecord[]>('/admin/feedback')]);
+      setEntries(records); setFeedback(messages); setProfileDraft(contact); setAuthenticated(true);
     } catch (caught) { report(caught); }
     finally { setBusy(false); }
   }
   async function logout() {
     setBusy(true); setError('');
-    try { await api('/admin/logout', { method: 'POST', body: '{}' }); setAuthenticated(false); setEntries([]); setSelected(null); setNotice(''); }
+    try { await api('/admin/logout', { method: 'POST', body: '{}' }); setAuthenticated(false); setEntries([]); setFeedback([]); setSelected(null); setNotice(''); }
     catch (caught) { report(caught); }
     finally { setBusy(false); }
   }
   async function refresh() {
     setBusy(true); setError(''); setNotice('');
-    try { setEntries(await api<ConsultationRecord[]>('/admin/consultations')); }
+    try {
+      if (tab === 'feedback') setFeedback(await api<FeedbackRecord[]>('/admin/feedback'));
+      else setEntries(await api<ConsultationRecord[]>('/admin/consultations'));
+    }
     catch (caught) { report(caught); }
     finally { setBusy(false); }
   }
@@ -104,8 +108,20 @@ export function Admin() {
             <nav aria-label="Sections de l’administration" className="flex flex-wrap gap-3 mb-8">
               <button onClick={() => { setTab('requests'); setNotice(''); }} aria-pressed={tab === 'requests'} className={`${buttonClass} ${tab === 'requests' ? 'ring-1 ring-gold' : ''}`}><Inbox className="w-4 h-4" aria-hidden="true" />Demandes ({entries.length})</button>
               <button onClick={() => { setTab('profile'); setNotice(''); }} aria-pressed={tab === 'profile'} className={`${buttonClass} ${tab === 'profile' ? 'ring-1 ring-gold' : ''}`}>Coordonnées de la voyante</button>
+              <button onClick={() => { setTab('feedback'); setNotice(''); }} aria-pressed={tab === 'feedback'} className={`${buttonClass} ${tab === 'feedback' ? 'ring-1 ring-gold' : ''}`}>Avis et suggestions ({feedback.length})</button>
             </nav>
-            {tab === 'profile' ? (
+            {tab === 'feedback' ? (
+              <section aria-label="Avis et suggestions" className="space-y-5">
+                <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-2xl text-gold font-semibold">Avis et suggestions</h2><button onClick={() => void refresh()} disabled={busy} className={buttonClass}><RefreshCw className="w-4 h-4" aria-hidden="true" />Actualiser</button></div>
+                {!feedback.length && <p>Aucun message pour le moment.</p>}
+                {feedback.map(item => <article key={item.id} className="border border-gold/30 rounded-xl p-5 space-y-3">
+                  <p className="text-gold font-semibold break-words">{item.name} · {item.kind === 'review' ? 'Avis' : 'Suggestion'}{item.rating !== null ? ` · ${item.rating} / 5` : ''}</p>
+                  <time dateTime={item.createdAt} className="block text-sm">{date(item.createdAt)}</time>
+                  {item.email && <a href={`mailto:${item.email}`} className="block break-all underline">{item.email}</a>}
+                  <p className="whitespace-pre-wrap break-words">{item.message}</p>
+                </article>)}
+              </section>
+            ) : tab === 'profile' ? (
               <form onSubmit={saveProfile} className="max-w-2xl border border-gold/30 rounded-2xl p-5 sm:p-8 space-y-5">
                 <h2 className="text-2xl font-semibold text-gold">Une voyante, tous les services</h2>
                 <p className="text-sm">Ces coordonnées s’affichent sur la page contact et dans le pied de page. Les contacts laissés vides sont masqués.</p>

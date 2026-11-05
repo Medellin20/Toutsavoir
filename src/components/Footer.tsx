@@ -42,6 +42,7 @@ export function Footer() {
                   {t('Contact')}
                 </Link>
               </li>
+              <li><Link to="/avis" className="hover:text-gold transition-colors">{t('Avis et suggestions')}</Link></li>
             </ul>
           </div>
 

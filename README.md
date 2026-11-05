@@ -18,6 +18,10 @@ Les demandes sont enregistrées côté serveur dans `.oryalune-data/` : fichiers
 - La page contact et le pied de page lisent les coordonnées enregistrées. Les numéros doivent inclure l’indicatif international. Les contacts vides sont masqués ; aucun numéro fictif n’est affiché par défaut.
 - Les boutons e-mail/WhatsApp de la page contact permettent un contact volontaire avec la voyante ; ils ne transmettent jamais le questionnaire.
 
+## Avis et suggestions
+
+La page `/avis`, accessible depuis le menu, le pied de page et les témoignages, permet de laisser un avis noté de 1 à 5 ou une suggestion. Le nom ou pseudonyme et le message sont obligatoires ; l’e-mail est facultatif. Les messages sont conservés côté serveur et lisibles uniquement dans l’onglet « Avis et suggestions » de l’admin. Ils ne sont pas publiés automatiquement. Les tentatives d’envoi utilisent un identifiant stable pour éviter les doublons et une panne ne produit pas de confirmation de sauvegarde.
+
 ## Hébergement Netlify
 
 Le dépôt contient `netlify.toml` et une Function `/api/*`. Netlify Blobs fournit le stockage persistant des demandes, du profil et des sessions. Les données ne sont pas intégrées aux fichiers publics et restent disponibles entre les déploiements. Le magasin est propre au site Netlify ; ne pas déployer des aperçus non fiables dans un site contenant de vraies demandes, car le magasin est partagé entre contextes de déploiement du même site.
