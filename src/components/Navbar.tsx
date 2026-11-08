@@ -1,6 +1,7 @@
 import { brand } from '../brand';
 import { Link } from 'react-router-dom';
-import { Eye } from 'lucide-react';
+import { Eye, Menu, X } from 'lucide-react';
+import { useState } from 'react';
 import { useLanguage, type Language } from '../contexts/LanguageContext';
 
 const languages: Array<{ code: Language; label: string; flag: string }> = [
@@ -13,6 +14,7 @@ const languages: Array<{ code: Language; label: string; flag: string }> = [
 
 export function Navbar() {
   const { language, setLanguage, t } = useLanguage();
+  const [menuOpen, setMenuOpen] = useState(false);
   return (
     <nav className="bg-midnight/90 backdrop-blur-md border-b border-gold/20 sticky top-0 z-50 animate-fade-in-down">
       <div className="container mx-auto px-4">
@@ -24,19 +26,32 @@ export function Navbar() {
             </span>
           </Link>
 
-          <div className="flex flex-wrap items-center gap-3 sm:gap-6">
-            <Link to="/" className="text-lavender hover:text-gold transition-colors">
+          <button
+            type="button"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-gold/30 text-gold lg:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold"
+            aria-expanded={menuOpen}
+            aria-controls="main-navigation"
+            aria-label={t(menuOpen ? 'Fermer le menu' : 'Ouvrir le menu')}
+            onClick={() => setMenuOpen(open => !open)}
+          >
+            {menuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+          </button>
+          <div id="main-navigation" className={`${menuOpen ? 'flex' : 'hidden'} w-full flex-col items-stretch gap-1 border-t border-gold/15 pt-3 lg:flex lg:w-auto lg:flex-row lg:flex-wrap lg:items-center lg:gap-5 lg:border-0 lg:pt-0`}
+            onClick={event => { if ((event.target as Element).closest('a')) setMenuOpen(false); }}
+            onKeyDown={event => { if (event.key === 'Escape') { setMenuOpen(false); document.querySelector<HTMLButtonElement>('[aria-controls="main-navigation"]')?.focus(); } }}
+          >
+            <Link to="/" className="rounded-lg px-2 py-3 text-lavender hover:text-gold transition-colors lg:px-0 lg:py-2">
               {t('Accueil')}
             </Link>
-            <Link to="/#services" className="text-lavender hover:text-gold transition-colors">
+            <Link to="/#services" className="rounded-lg px-2 py-3 text-lavender hover:text-gold transition-colors lg:px-0 lg:py-2">
               {t('Nos Services')}
             </Link>
-            <Link to="/reservation" className="text-gold hover:text-lavender">{t('Réserver')}</Link>
-            <Link to="/contact" className="text-lavender hover:text-gold transition-colors">
+            <Link to="/reservation" className="rounded-lg px-2 py-3 text-gold hover:text-lavender lg:px-0 lg:py-2">{t('Réserver')}</Link>
+            <Link to="/contact" className="rounded-lg px-2 py-3 text-lavender hover:text-gold transition-colors lg:px-0 lg:py-2">
               {t('Contact')}
             </Link>
-            <Link to="/avis" className="text-lavender hover:text-gold transition-colors">{t('Avis et suggestions')}</Link>
-            <label className="flex items-center gap-1 rounded-full border border-gold/30 bg-midnight/70 px-3 py-2 text-lavender">
+            <Link to="/avis" className="rounded-lg px-2 py-3 text-lavender hover:text-gold transition-colors lg:px-0 lg:py-2">{t('Avis et suggestions')}</Link>
+            <label className="my-2 flex w-fit max-w-full items-center gap-1 rounded-full border border-gold/30 bg-midnight/70 px-3 py-2 text-lavender">
               <span aria-hidden="true">🌐</span>
               <span className="sr-only">{t('Traducteur')}</span>
               <select

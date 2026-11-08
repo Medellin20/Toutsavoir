@@ -6,6 +6,12 @@ export type Language = 'fr' | 'nl' | 'en' | 'es' | 'it' | 'de' | 'pt' | 'ar' | '
 const languages: Language[] = ['fr', 'nl', 'en', 'es', 'it', 'de', 'pt', 'ar', 'pl'];
 
 const translations: Record<string, readonly string[]> = {
+  "Le Portail Céleste": ["Le Portail Céleste", "Het Hemelse Portaal", "The Celestial Portal", "El Portal Celeste", "Il Portale Celeste", "Das Himmelsportal", "O Portal Celestial", "البوابة السماوية", "Niebiański Portal"],
+  "Découvrir nos consultations": ["Découvrir nos consultations", "Ontdek onze consulten", "Discover our consultations", "Descubre nuestras consultas", "Scopri le nostre consulenze", "Unsere Beratungen entdecken", "Descubra as nossas consultas", "اكتشف استشاراتنا", "Odkryj nasze konsultacje"],
+  "Ouvrir le menu": ["Ouvrir le menu", "Menu openen", "Open menu", "Abrir el menú", "Apri il menu", "Menü öffnen", "Abrir o menu", "فتح القائمة", "Otwórz menu"],
+  "Fermer le menu": ["Fermer le menu", "Menu sluiten", "Close menu", "Cerrar el menú", "Chiudi il menu", "Menü schließen", "Fechar o menu", "إغلاق القائمة", "Zamknij menu"],
+  'Voir tous les commentaires': ['Voir tous les commentaires', 'Alle reacties bekijken', 'View all comments', 'Ver todos los comentarios', 'Mostra tutti i commenti', 'Alle Kommentare anzeigen', 'Ver todos os comentários', 'عرض جميع التعليقات', 'Zobacz wszystkie komentarze'],
+  'Voir moins de commentaires': ['Voir moins de commentaires', 'Minder reacties bekijken', 'Show fewer comments', 'Ver menos comentarios', 'Mostra meno commenti', 'Weniger Kommentare anzeigen', 'Ver menos comentários', 'عرض تعليقات أقل', 'Pokaż mniej komentarzy'],
   ...consultationTranslations,
   "Contact avec les défunts": ["Contact avec les défunts", "Contact met overledenen", "Contact with departed loved ones", "Contacto con los difuntos", "Contatto con i defunti", "Kontakt mit Verstorbenen", "Contacto com os falecidos", "التواصل مع الراحلين", "Kontakt ze zmarłymi"],
   "Mariage et avenir amoureux": ["Mariage et avenir amoureux", "Huwelijk en liefdestoekomst", "Marriage and love prospects", "Matrimonio y futuro amoroso", "Matrimonio e futuro sentimentale", "Ehe und Liebeszukunft", "Casamento e futuro amoroso", "الزواج والمستقبل العاطفي", "Małżeństwo i przyszłość miłosna"],

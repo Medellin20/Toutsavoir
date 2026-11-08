@@ -14,7 +14,7 @@ import { LanguageProvider } from './contexts/LanguageContext';
 function ScrollToPage() {
   const { pathname, hash } = useLocation();
   useEffect(() => {
-    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: 'smooth' });
+    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     else window.scrollTo(0, 0);
   }, [pathname, hash]);
   return null;
