@@ -22,7 +22,7 @@ export function BookingAgenda() {
   return <form onSubmit={publish} className="border border-gold/30 rounded-2xl p-6 space-y-5 max-w-2xl">
     <h2 className="text-2xl text-gold font-semibold">Ouvrir les réservations</h2>
     <p>Publiez une plage pour chaque journée où la voyante est disponible. Les créneaux sont communs à tous les services et ne se chevauchent pas. Une journée publiée ne peut pas être modifiée ici ; vérifiez les horaires avant publication.</p>
-    <p className="text-sm">Fuseau Africa/Porto-Novo (UTC+1). Préavis : une heure. Chaque journée propose une même durée de consultation.</p>
+    <p className="text-sm">Chaque journée propose une même durée de consultation.</p>
     <label className="block">Date<input required type="date" className={input} value={date} onChange={event => setDate(event.target.value)} /></label>
     <div className="grid sm:grid-cols-2 gap-4"><label>Début<input required type="time" className={input} value={start} onChange={event => setStart(event.target.value)} /></label><label>Fin<input required type="time" className={input} value={end} onChange={event => setEnd(event.target.value)} /></label></div>
     <label className="block">Durée des consultations<select className={input} value={duration} onChange={event => setDuration(Number(event.target.value))}>{bookingDurations.map(value => <option key={value} value={value}>{value} minutes</option>)}</select></label>
