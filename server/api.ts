@@ -1,4 +1,4 @@
-import { bookingDurations, type BookingDay, type BookingSlot } from '../src/booking-data';
+import { bookingDurations, defaultSchedule, scheduleSlots, overlaps, slotClaims, type BookingSchedule, type BookingSlot } from '../src/booking-data';
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { services } from '../src/data';
 import { commonQuestions, serviceQuestions, closingQuestions } from '../src/consultation-data';
@@ -81,11 +81,12 @@ export function createApi(store: Storage, options: { password: () => string | un
         if (!body || typeof body !== 'object' || Array.isArray(body)) throw new HttpError(400, 'Données invalides.');
         return body as Record<string, unknown>;
       };
+      const getSchedule = async () => await store.get<BookingSchedule>('booking-schedule') ?? defaultSchedule;
+      const getBookings = async () => (await Promise.all((await store.list('bookings/')).map(key => store.get<ConsultationRecord>(key)))).filter((item): item is ConsultationRecord => !!item);
       if (path === '/availability' && request.method === 'GET') {
-        const days = await Promise.all((await store.list('agenda/')).map(key => store.get<BookingDay>(key)));
-        const slots = days.flatMap(day => day?.slots ?? []).filter(slot => Date.parse(slot.start) > Date.now() + 3600000);
-        const available = await Promise.all(slots.map(async slot => await store.get(`bookings/${slot.start}`) ? null : slot));
-        return json(available.filter(Boolean).sort((a, b) => a!.start.localeCompare(b!.start)));
+        const [schedule, bookings, locks] = await Promise.all([getSchedule(), getBookings(), store.list('booking-locks/')]);
+        const occupied = new Set(locks);
+        return json(scheduleSlots(schedule).filter(slot => !bookings.some(record => record.booking && overlaps(slot, record.booking)) && !slotClaims(slot).some(key => occupied.has(key))));
       }
       if (path === '/bookings' && request.method === 'POST') {
         if (!store.create) throw new HttpError(503, 'Réservation indisponible.');
@@ -96,10 +97,26 @@ export function createApi(store: Storage, options: { password: () => string | un
         const key = `bookings/${booking.start}`;
         const existing = await store.get<ConsultationRecord>(key);
         if (existing?.id === entry.id && existing.serviceId === entry.serviceId && existing.booking?.duration === booking.duration && JSON.stringify(existing.answers) === JSON.stringify(entry.answers)) return json({ saved: true }, 201);
-        const day = await store.get<BookingDay>(`agenda/${new Date(Date.parse(booking.start) + 3600000).toISOString().slice(0, 10)}`);
-        if (Date.parse(booking.start) <= Date.now() + 3600000 || !day?.slots.some(slot => slot.start === booking.start && slot.duration === booking.duration)) throw new HttpError(400, 'Ce créneau n’est plus proposé.');
+        if (!scheduleSlots(await getSchedule()).some(slot => slot.start === booking.start && slot.duration === booking.duration)) throw new HttpError(400, 'Ce créneau n’est plus proposé.');
+        if ((await getBookings()).some(record => record.booking && overlaps(booking, record.booking))) throw new HttpError(409, 'Ce créneau vient d’être réservé. Choisissez un autre horaire.');
+        const acquired: string[] = [];
+        for (const claim of slotClaims(booking)) {
+          if (await store.create(claim, { id: entry.id })) acquired.push(claim);
+          else if ((await store.get<{ id: string }>(claim))?.id !== entry.id) {
+            for (const held of acquired) await store.delete(held);
+            throw new HttpError(409, 'Ce créneau vient d’être réservé. Choisissez un autre horaire.');
+          }
+        }
+        // Recheck after acquiring locks in case the administrator changed the hours.
+        if (!scheduleSlots(await getSchedule()).some(slot => slot.start === booking.start && slot.duration === booking.duration)) {
+          for (const held of acquired) await store.delete(held);
+          throw new HttpError(400, 'Les horaires ont changé. Choisissez un nouveau créneau.');
+        }
         const record = { ...entry, booking: { start: booking.start, duration: booking.duration } };
-        if (!await store.create(key, record)) throw new HttpError(409, 'Ce créneau vient d’être réservé. Choisissez un autre horaire.');
+        if (!await store.create(key, record)) {
+          const saved = await store.get<ConsultationRecord>(key);
+          if (saved?.id !== entry.id) throw new HttpError(409, 'Ce créneau vient d’être réservé.');
+        }
         return json({ saved: true }, 201);
       }
       if (path === '/profile' && request.method === 'GET') return json(await store.get<VoyantProfile>('profile') ?? defaultProfile);
@@ -148,21 +165,19 @@ export function createApi(store: Storage, options: { password: () => string | un
         await store.delete(sessionKey);
         return json({ authenticated: false }, 200, { 'Set-Cookie': cookie('', 0) });
       }
-      if (path === '/admin/agenda' && request.method === 'POST') {
+      if (path === '/admin/agenda' && request.method === 'GET') return json(await getSchedule());
+      if (path === '/admin/agenda' && request.method === 'PUT') {
         const body = await readBody();
-        const date = requireText(body.date, 10, true);
         const start = requireText(body.start, 5, true);
         const end = requireText(body.end, 5, true);
         const duration = Number(body.duration);
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(start) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(end) || !bookingDurations.includes(duration as 15 | 30 | 60)) throw new HttpError(400, 'Horaires invalides.');
-        const from = Date.parse(`${date}T${start}:00+01:00`);
-        const to = Date.parse(`${date}T${end}:00+01:00`);
-        if (!Number.isFinite(from) || from <= Date.now() + 3600000 || to <= from || to - from > 12 * 3600000 || new Date(from + 3600000).toISOString().slice(0, 10) !== date) throw new HttpError(400, 'Choisissez une plage future de 12 heures maximum.');
-        const slots: BookingSlot[] = [];
-        for (let time = from; time + duration * 60000 <= to; time += duration * 60000) slots.push({ start: new Date(time).toISOString(), duration });
-        if (!slots.length) throw new HttpError(400, 'Plage trop courte pour cette durée.');
-        if (!store.create || !await store.create(`agenda/${date}`, { date, slots })) throw new HttpError(409, 'Cette journée a déjà été publiée.');
-        return json({ saved: true, count: slots.length }, 201);
+        const clock = /^([01]\d|2[0-3]):[0-5]\d$/;
+        if (!clock.test(start) || !clock.test(end) || end <= start || typeof body.enabled !== 'boolean' || !bookingDurations.includes(duration as 15 | 30 | 60)) throw new HttpError(400, 'Horaires invalides.');
+        const minutes = (value: string) => Number(value.slice(0, 2)) * 60 + Number(value.slice(3));
+        if (minutes(end) - minutes(start) < duration) throw new HttpError(400, 'Plage trop courte pour cette durée.');
+        const schedule: BookingSchedule = { start, end, duration, enabled: body.enabled };
+        await store.set('booking-schedule', schedule);
+        return json(schedule);
       }
       if (path === '/admin/consultations' && request.method === 'GET') {
         const keys = [...await store.list('consultations/'), ...await store.list('bookings/')].sort().reverse();

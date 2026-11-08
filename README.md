@@ -20,11 +20,11 @@ Les demandes sont enregistrées côté serveur dans `.oryalune-data/` : fichiers
 
 ## Réservations
 
-Dans `/admin` → **Disponibilités**, publier une date, une heure de début et de fin et une durée (15, 30 ou 60 minutes). Les heures sont en **Africa/Porto-Novo (UTC+1)**. Chaque journée propose une durée unique et ne peut être publiée qu’une fois ; cette version ne permet pas de modifier ou d’annuler une journée publiée. Une éventuelle fin de plage insuffisante pour une consultation entière n’est pas proposée.
+Dans `/admin` → **Disponibilités**, définir une heure de début, une heure de fin et une durée (15, 30 ou 60 minutes). Ces horaires se répètent automatiquement tous les jours sur les 30 prochains jours et sont modifiables. Par défaut : 09:00–17:00, séances de 30 minutes. L’interrupteur permet de suspendre les nouvelles réservations. Les anciennes publications par date sont remplacées par cet horaire commun.
 
-Aucun créneau fictif n’est ouvert par défaut. Le client choisit parmi les créneaux publiés correspondant à sa durée, avec au moins une heure de préavis. Tous les services partagent l’agenda d’une seule voyante. Les rendez-vous s’affichent avec les réponses dans l’onglet **Demandes**. Une confirmation apparaît sur le site après sauvegarde ; aucun e-mail automatique n’est envoyé.
+Les rendez-vous existants sont conservés lors d’une modification. Tout créneau qui chevauche un rendez-vous est masqué, même si les heures de début ou la durée changent. Le serveur contrôle à nouveau la disponibilité et les horaires lors de la confirmation. Les réservations s’affichent dans **Demandes**. Aucun e-mail automatique n’est envoyé ; l’annulation ou le déplacement d’un rendez-vous ne sont pas inclus.
 
-L’API réserve une clé unique par créneau (`onlyIfNew` dans Netlify Blobs, création exclusive locale). Le questionnaire et le rendez-vous sont stockés dans un même enregistrement : une demande concurrente est refusée et une nouvelle tentative identique retrouve la réservation existante. Les réservations ne sont pas supprimées automatiquement. L’annulation et le déplacement ne sont pas inclus dans cette version.
+Chaque minute occupée est protégée par une création exclusive côté stockage, commune à tous les services et toutes les durées. Une erreur de stockage conserve les verrous acquis pour éviter de proposer un rendez-vous incertain ; une nouvelle tentative identique peut terminer l’enregistrement. Une interruption définitive peut nécessiter de nettoyer ces verrous côté stockage après vérification. Le questionnaire et le rendez-vous sont conservés dans un même enregistrement privé.
 
 ## Avis et suggestions
 
