@@ -30,6 +30,7 @@ function App() {
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/reservation" element={<Consultation />} />
             <Route path="/consultation/:serviceId" element={<Consultation />} />
             <Route path="/packs" element={<Navigate to="/#services" replace />} />
             <Route path="/payment" element={<Navigate to="/#services" replace />} />

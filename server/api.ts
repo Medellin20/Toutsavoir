@@ -1,9 +1,11 @@
+import { bookingDurations, type BookingDay, type BookingSlot } from '../src/booking-data';
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { services } from '../src/data';
 import { commonQuestions, serviceQuestions, closingQuestions } from '../src/consultation-data';
 import { defaultProfile, type ConsultationRecord, type FeedbackRecord, type VoyantProfile } from '../src/platform-types';
 
 export interface Storage {
+  create?(key: string, value: unknown): Promise<boolean>;
   get<T>(key: string): Promise<T | null>;
   set(key: string, value: unknown): Promise<void>;
   list(prefix: string): Promise<string[]>;
@@ -79,6 +81,27 @@ export function createApi(store: Storage, options: { password: () => string | un
         if (!body || typeof body !== 'object' || Array.isArray(body)) throw new HttpError(400, 'Données invalides.');
         return body as Record<string, unknown>;
       };
+      if (path === '/availability' && request.method === 'GET') {
+        const days = await Promise.all((await store.list('agenda/')).map(key => store.get<BookingDay>(key)));
+        const slots = days.flatMap(day => day?.slots ?? []).filter(slot => Date.parse(slot.start) > Date.now() + 3600000);
+        const available = await Promise.all(slots.map(async slot => await store.get(`bookings/${slot.start}`) ? null : slot));
+        return json(available.filter(Boolean).sort((a, b) => a!.start.localeCompare(b!.start)));
+      }
+      if (path === '/bookings' && request.method === 'POST') {
+        if (!store.create) throw new HttpError(503, 'Réservation indisponible.');
+        const body = await readBody();
+        const entry = validateConsultation(body);
+        const booking = body.booking as BookingSlot | undefined;
+        if (!booking || typeof booking.start !== 'string' || !Number.isFinite(Date.parse(booking.start)) || !bookingDurations.includes(booking.duration as 15 | 30 | 60)) throw new HttpError(400, 'Créneau invalide.');
+        const key = `bookings/${booking.start}`;
+        const existing = await store.get<ConsultationRecord>(key);
+        if (existing?.id === entry.id && existing.serviceId === entry.serviceId && existing.booking?.duration === booking.duration && JSON.stringify(existing.answers) === JSON.stringify(entry.answers)) return json({ saved: true }, 201);
+        const day = await store.get<BookingDay>(`agenda/${new Date(Date.parse(booking.start) + 3600000).toISOString().slice(0, 10)}`);
+        if (Date.parse(booking.start) <= Date.now() + 3600000 || !day?.slots.some(slot => slot.start === booking.start && slot.duration === booking.duration)) throw new HttpError(400, 'Ce créneau n’est plus proposé.');
+        const record = { ...entry, booking: { start: booking.start, duration: booking.duration } };
+        if (!await store.create(key, record)) throw new HttpError(409, 'Ce créneau vient d’être réservé. Choisissez un autre horaire.');
+        return json({ saved: true }, 201);
+      }
       if (path === '/profile' && request.method === 'GET') return json(await store.get<VoyantProfile>('profile') ?? defaultProfile);
       if (path === '/consultations' && request.method === 'POST') {
         const entry = validateConsultation(await readBody());
@@ -125,8 +148,24 @@ export function createApi(store: Storage, options: { password: () => string | un
         await store.delete(sessionKey);
         return json({ authenticated: false }, 200, { 'Set-Cookie': cookie('', 0) });
       }
+      if (path === '/admin/agenda' && request.method === 'POST') {
+        const body = await readBody();
+        const date = requireText(body.date, 10, true);
+        const start = requireText(body.start, 5, true);
+        const end = requireText(body.end, 5, true);
+        const duration = Number(body.duration);
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(start) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(end) || !bookingDurations.includes(duration as 15 | 30 | 60)) throw new HttpError(400, 'Horaires invalides.');
+        const from = Date.parse(`${date}T${start}:00+01:00`);
+        const to = Date.parse(`${date}T${end}:00+01:00`);
+        if (!Number.isFinite(from) || from <= Date.now() + 3600000 || to <= from || to - from > 12 * 3600000 || new Date(from + 3600000).toISOString().slice(0, 10) !== date) throw new HttpError(400, 'Choisissez une plage future de 12 heures maximum.');
+        const slots: BookingSlot[] = [];
+        for (let time = from; time + duration * 60000 <= to; time += duration * 60000) slots.push({ start: new Date(time).toISOString(), duration });
+        if (!slots.length) throw new HttpError(400, 'Plage trop courte pour cette durée.');
+        if (!store.create || !await store.create(`agenda/${date}`, { date, slots })) throw new HttpError(409, 'Cette journée a déjà été publiée.');
+        return json({ saved: true, count: slots.length }, 201);
+      }
       if (path === '/admin/consultations' && request.method === 'GET') {
-        const keys = (await store.list('consultations/')).sort().reverse();
+        const keys = [...await store.list('consultations/'), ...await store.list('bookings/')].sort().reverse();
         const records = await Promise.all(keys.map(key => store.get<ConsultationRecord>(key)));
         return json(records.filter(Boolean).sort((a, b) => b!.createdAt.localeCompare(a!.createdAt)));
       }

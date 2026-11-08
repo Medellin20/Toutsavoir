@@ -11,12 +11,20 @@ Les demandes sont enregistrées côté serveur dans `.oryalune-data/` : fichiers
 
 ## Parcours client et admin
 
-- Service → questionnaire → récapitulatif → enregistrement serveur confirmé → `/contact`.
+- `/reservation` ou choix d’un service → durée et créneau disponible → questionnaire → récapitulatif → réservation serveur confirmée → `/contact`.
 - En cas d’échec d’enregistrement, les réponses restent dans le formulaire et un bouton permet de réessayer. Un identifiant stable évite les doublons lors d’une nouvelle tentative.
 - Aucun questionnaire n’est envoyé par e-mail et aucune réponse n’est placée dans un lien WhatsApp, une URL ou le stockage du navigateur.
 - `/admin` : connexion, liste/recherche des demandes et lecture détaillée de toutes les réponses ; onglet pour modifier le nom, la présentation, le téléphone, WhatsApp, l’e-mail et les horaires de l’unique voyante.
 - La page contact et le pied de page lisent les coordonnées enregistrées. Les numéros doivent inclure l’indicatif international. Les contacts vides sont masqués ; aucun numéro fictif n’est affiché par défaut.
 - Les boutons e-mail/WhatsApp de la page contact permettent un contact volontaire avec la voyante ; ils ne transmettent jamais le questionnaire.
+
+## Réservations
+
+Dans `/admin` → **Disponibilités**, publier une date, une heure de début et de fin et une durée (15, 30 ou 60 minutes). Les heures sont en **Africa/Porto-Novo (UTC+1)**. Chaque journée propose une durée unique et ne peut être publiée qu’une fois ; cette version ne permet pas de modifier ou d’annuler une journée publiée. Une éventuelle fin de plage insuffisante pour une consultation entière n’est pas proposée.
+
+Aucun créneau fictif n’est ouvert par défaut. Le client choisit parmi les créneaux publiés correspondant à sa durée, avec au moins une heure de préavis. Tous les services partagent l’agenda d’une seule voyante. Les rendez-vous s’affichent avec les réponses dans l’onglet **Demandes**. Une confirmation apparaît sur le site après sauvegarde ; aucun e-mail automatique n’est envoyé.
+
+L’API réserve une clé unique par créneau (`onlyIfNew` dans Netlify Blobs, création exclusive locale). Le questionnaire et le rendez-vous sont stockés dans un même enregistrement : une demande concurrente est refusée et une nouvelle tentative identique retrouve la réservation existante. Les réservations ne sont pas supprimées automatiquement. L’annulation et le déplacement ne sont pas inclus dans cette version.
 
 ## Avis et suggestions
 

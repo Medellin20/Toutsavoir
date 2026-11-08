@@ -243,3 +243,38 @@ test('avis et suggestions : validation et refus des fausses confirmations', asyn
     assert.equal((await response.json()).saved, undefined);
   } finally { await rm(directory, { recursive: true, force: true }); }
 });
+
+test('réservations : créneaux publiés, concurrence, reprise et accès administrateur', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'oryalune-bookings-'));
+  const password = randomBytes(24).toString('hex');
+  const make = () => createApi(localStore(directory), { password: () => password, secure: false });
+  try {
+    let handle = make();
+    const date = new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10);
+    const agenda = { date, start: '09:00', end: '11:00', duration: 30 };
+    assert.equal((await handle(request('/admin/agenda', 'POST', agenda))).status, 401);
+    const login = await handle(request('/admin/login', 'POST', { password }));
+    const cookie = login.headers.get('set-cookie')!.split(';')[0];
+    assert.equal((await handle(request('/admin/agenda', 'POST', { ...agenda, end: '08:00' }, cookie))).status, 400);
+    assert.equal((await handle(request('/admin/agenda', 'POST', agenda, cookie))).status, 201);
+    assert.equal((await handle(request('/admin/agenda', 'POST', agenda, cookie))).status, 409);
+    const slots = await (await handle(request('/availability'))).json() as { start: string; duration: number }[];
+    assert.equal(slots.length, 4);
+    const first = { ...entry(), booking: slots[0] };
+    const second = { ...entry(), serviceId: 'meditation', answers: { ...entry().answers, wellbeingGoal: 'Me détendre' }, booking: slots[0] };
+    assert.equal((await handle(request('/bookings', 'POST', { ...first, booking: { ...slots[0], duration: 60 } }))).status, 400);
+    assert.equal((await handle(request('/bookings', 'POST', { ...first, booking: { start: 'invalide', duration: 30 } }))).status, 400);
+    const responses = await Promise.all([handle(request('/bookings', 'POST', first)), make()(request('/bookings', 'POST', second))]);
+    assert.deepEqual(responses.map(response => response.status).sort(), [201, 409]);
+    const winner = responses[0].status === 201 ? first : second;
+    handle = make();
+    assert.equal((await handle(request('/bookings', 'POST', winner))).status, 201);
+    assert.equal((await (await handle(request('/availability'))).json()).length, 3);
+    const records = await (await handle(request('/admin/consultations', 'GET', undefined, cookie))).json() as ConsultationRecord[];
+    assert.equal(records.length, 1);
+    assert.equal(records[0].id, winner.id);
+    assert.deepEqual(records[0].booking, slots[0]);
+    const unpublished = { ...entry(), booking: { start: new Date(Date.now() + 20 * 86400000).toISOString(), duration: 30 } };
+    assert.equal((await handle(request('/bookings', 'POST', unpublished))).status, 400);
+  } finally { await rm(directory, { recursive: true, force: true }); }
+});

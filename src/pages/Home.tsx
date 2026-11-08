@@ -60,13 +60,13 @@ export function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {services.map((service, index) => {
-              const Icon = serviceIcons[index];
+              const Icon = serviceIcons[index] ?? Sparkles;
               return (
               <Link
                 to={`/consultation/${service.id}`}
                 key={service.id}
                 className="group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold flex flex-col bg-gradient-to-br from-royal/80 to-midnight/80 backdrop-blur-sm p-6 rounded-xl border border-gold/20 hover:border-gold/50 transition-all transform hover:scale-105 hover:shadow-xl hover:shadow-orchid/20 animate-fade-in-up"
-                style={{ animationDelay: `${index * 0.15}s` }}
+                style={{ animationDelay: `${Math.min(index, 6) * 0.15}s` }}
               >
                 <Icon aria-hidden="true" className="h-12 w-12 text-gold mb-4 transition-transform duration-300 group-hover:scale-110" />
                 <h3 className="text-xl font-bold text-gold mb-2">{t(service.title)}</h3>

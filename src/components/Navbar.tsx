@@ -31,6 +31,7 @@ export function Navbar() {
             <Link to="/#services" className="text-lavender hover:text-gold transition-colors">
               {t('Nos Services')}
             </Link>
+            <Link to="/reservation" className="text-gold hover:text-lavender">{t('Réserver')}</Link>
             <Link to="/contact" className="text-lavender hover:text-gold transition-colors">
               {t('Contact')}
             </Link>

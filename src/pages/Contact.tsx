@@ -1,3 +1,4 @@
+import { formatBooking } from '../booking-data';
 import { MessageCircle, Mail, Phone, Clock, CheckCircle, Sparkles } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -12,7 +13,7 @@ export function Contact() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-midnight to-royal py-12 sm:py-16 px-4">
       <div className="max-w-3xl mx-auto">
-        {location.state?.consultationSaved && <div role="status" className="mb-8 rounded-xl border border-gold/40 bg-royal/50 p-5 flex gap-3"><CheckCircle aria-hidden="true" className="text-gold shrink-0" /><div><p className="font-bold text-gold">{t('Demande enregistrée !')}</p><p>{t('Votre questionnaire a été transmis. Contactez maintenant votre voyante pour poursuivre.')}</p></div></div>}
+        {location.state?.consultationSaved && <div role="status" className="mb-8 rounded-xl border border-gold/40 bg-royal/50 p-5 flex gap-3"><CheckCircle aria-hidden="true" className="text-gold shrink-0" /><div><p className="font-bold text-gold">{t(location.state?.booking ? 'Réservation confirmée !' : 'Demande enregistrée !')}</p>{location.state?.booking && <p className="my-2 text-gold">{formatBooking(location.state.booking)}</p>}<p>{t('Votre questionnaire a été transmis. Contactez maintenant votre voyante pour poursuivre.')}</p></div></div>}
         <div className="text-center mb-10">
           <Sparkles aria-hidden="true" className="h-12 w-12 text-gold mx-auto mb-4" />
           <h1 className="text-3xl sm:text-5xl font-bold text-gold mb-4">{t('Votre voyante')}</h1>

@@ -9,6 +9,7 @@ export interface VoyantProfile {
 export interface ConsultationRecord {
   id: string;
   serviceId: string;
+  booking?: import('./booking-data').BookingSlot;
   createdAt: string;
   language: string;
   answers: Record<string, string>;

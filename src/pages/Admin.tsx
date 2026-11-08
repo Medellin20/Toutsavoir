@@ -1,3 +1,5 @@
+import { BookingAgenda } from '../components/BookingAgenda';
+import { formatBooking } from '../booking-data';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Lock, LogOut, RefreshCw, Save, Inbox } from 'lucide-react';
 import { api, ApiError } from '../api';
@@ -25,7 +27,7 @@ export function Admin() {
   const [profileDraft, setProfileDraft] = useState(defaultProfile);
   const [selected, setSelected] = useState<string | null>(null);
   const [search, setSearch] = useState('');
-  const [tab, setTab] = useState<'requests' | 'profile' | 'feedback'>('requests');
+  const [tab, setTab] = useState<'requests' | 'profile' | 'feedback' | 'agenda'>('requests');
   const [visibleCount, setVisibleCount] = useState(20);
 
   useEffect(() => {
@@ -106,11 +108,12 @@ export function Admin() {
         ) : (
           <>
             <nav aria-label="Sections de l’administration" className="flex flex-wrap gap-3 mb-8">
+              <button onClick={() => setTab('agenda')} aria-pressed={tab === 'agenda'} className={buttonClass}>Disponibilités</button>
               <button onClick={() => { setTab('requests'); setNotice(''); }} aria-pressed={tab === 'requests'} className={`${buttonClass} ${tab === 'requests' ? 'ring-1 ring-gold' : ''}`}><Inbox className="w-4 h-4" aria-hidden="true" />Demandes ({entries.length})</button>
               <button onClick={() => { setTab('profile'); setNotice(''); }} aria-pressed={tab === 'profile'} className={`${buttonClass} ${tab === 'profile' ? 'ring-1 ring-gold' : ''}`}>Coordonnées de la voyante</button>
               <button onClick={() => { setTab('feedback'); setNotice(''); }} aria-pressed={tab === 'feedback'} className={`${buttonClass} ${tab === 'feedback' ? 'ring-1 ring-gold' : ''}`}>Avis et suggestions ({feedback.length})</button>
             </nav>
-            {tab === 'feedback' ? (
+            {tab === 'agenda' ? <BookingAgenda /> : tab === 'feedback' ? (
               <section aria-label="Avis et suggestions" className="space-y-5">
                 <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-2xl text-gold font-semibold">Avis et suggestions</h2><button onClick={() => void refresh()} disabled={busy} className={buttonClass}><RefreshCw className="w-4 h-4" aria-hidden="true" />Actualiser</button></div>
                 {!feedback.length && <p>Aucun message pour le moment.</p>}
@@ -144,11 +147,11 @@ export function Admin() {
                 <div className="grid lg:grid-cols-2 gap-6">
                   <section aria-label="Demandes reçues" className="space-y-3">
                     {!filtered.length && <p className="p-6 border border-gold/20 rounded-xl">{entries.length ? 'Aucun résultat pour cette recherche.' : 'Aucune demande pour le moment.'}</p>}
-                    {filtered.slice(0, visibleCount).map(entry => <button key={entry.id} onClick={() => setSelected(entry.id)} aria-pressed={entry.id === selected} className={`w-full text-start border rounded-xl p-5 hover:bg-royal/70 ${selected === entry.id ? 'border-gold bg-royal/50' : 'border-gold/20'}`}><span className="block font-semibold text-gold break-words">{entry.answers.firstName} {entry.answers.lastName}</span><span className="block my-1">{serviceName(entry.serviceId)}</span><span className="block text-sm break-all">{entry.answers.email}</span><time dateTime={entry.createdAt} className="block text-sm mt-2">{date(entry.createdAt)}</time></button>)}
+                    {filtered.slice(0, visibleCount).map(entry => <button key={entry.id} onClick={() => setSelected(entry.id)} aria-pressed={entry.id === selected} className={`w-full text-start border rounded-xl p-5 hover:bg-royal/70 ${selected === entry.id ? 'border-gold bg-royal/50' : 'border-gold/20'}`}><span className="block font-semibold text-gold break-words">{entry.answers.firstName} {entry.answers.lastName}</span><span className="block my-1">{serviceName(entry.serviceId)}</span><span className="block text-sm break-all">{entry.answers.email}</span>{entry.booking && <span className="block text-gold mt-2">{formatBooking(entry.booking)}</span>}<time dateTime={entry.createdAt} className="block text-sm mt-2">{date(entry.createdAt)}</time></button>)}
                     {filtered.length > visibleCount && <button onClick={() => setVisibleCount(count => count + 20)} className={buttonClass}>Afficher plus</button>}
                   </section>
                   <section aria-label="Détail de la demande" className="min-w-0 rounded-2xl border border-gold/30 p-5 sm:p-8 self-start">
-                    {current ? <><h2 className="text-2xl font-semibold text-gold mb-2">{serviceName(current.serviceId)}</h2><p className="text-sm mb-6">Reçue le {date(current.createdAt)} · Langue : {current.language.toUpperCase()}</p><dl className="space-y-5">{Object.entries(current.answers).filter(([, value]) => value).map(([key, value]) => <div key={key}><dt className="text-gold font-semibold mb-1">{labels[key] ?? key}</dt><dd className="whitespace-pre-wrap break-words">{value}</dd></div>)}</dl></> : <p>Sélectionnez une demande pour consulter toutes les réponses.</p>}
+                    {current ? <><h2 className="text-2xl font-semibold text-gold mb-2">{serviceName(current.serviceId)}</h2><p className="text-sm mb-6">Reçue le {date(current.createdAt)} · Langue : {current.language.toUpperCase()}</p>{current.booking && <p className="mb-6 text-gold">Réservation : {formatBooking(current.booking)}</p>}<dl className="space-y-5">{Object.entries(current.answers).filter(([, value]) => value).map(([key, value]) => <div key={key}><dt className="text-gold font-semibold mb-1">{labels[key] ?? key}</dt><dd className="whitespace-pre-wrap break-words">{value}</dd></div>)}</dl></> : <p>Sélectionnez une demande pour consulter toutes les réponses.</p>}
                   </section>
                 </div>
               </>
