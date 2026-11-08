@@ -18,7 +18,7 @@ export function Contact() {
         <div className="text-center mb-10">
           <Sparkles aria-hidden="true" className="h-12 w-12 text-gold mx-auto mb-4" />
           <h1 className="text-3xl sm:text-5xl font-bold text-gold mb-4">{t('Votre voyante')}</h1>
-          <p className="text-lavender/90">{t('Une seule voyante vous accompagne pour tous les services Oryalune.')}</p>
+          <p className="text-lavender/90">{t('Une seule voyante vous accompagne pour tous les services Orialune.')}</p>
         </div>
         {loading ? <p role="status">{t('Chargement...')}</p> : error ? <div role="alert" className="rounded-xl border border-gold/40 p-6"><p>{t(error)}</p><button onClick={() => void refresh()} className="mt-4 underline text-gold">{t('Réessayer')}</button></div> : (
           <article className="rounded-2xl border border-gold/30 bg-gradient-to-br from-royal/80 to-midnight/80 p-6 sm:p-10">

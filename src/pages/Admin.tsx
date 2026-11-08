@@ -91,7 +91,7 @@ export function Admin() {
     <div className="min-h-screen bg-gradient-to-br from-midnight to-royal px-4 py-10 text-lavender">
       <div className="max-w-6xl mx-auto">
         <header className="flex flex-wrap justify-between items-center gap-4 mb-8">
-          <h1 className="text-3xl font-bold text-gold">Administration Oryalune</h1>
+          <h1 className="text-3xl font-bold text-gold">Administration Orialune</h1>
           {authenticated && <button onClick={() => void logout()} disabled={busy} className={buttonClass}><LogOut className="w-4 h-4" aria-hidden="true" />Se déconnecter</button>}
         </header>
         {error && <p role="alert" className="border border-gold/50 rounded-xl p-4 mb-6">{error}</p>}

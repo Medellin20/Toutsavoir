@@ -31,7 +31,7 @@ export function Feedback() {
     <div className="max-w-2xl mx-auto">
       <MessageSquare aria-hidden="true" className="h-12 w-12 text-gold mb-5" />
       <h1 className="text-3xl sm:text-4xl font-bold text-gold mb-4">{t('Avis et suggestions')}</h1>
-      <p className="mb-8">{t('Partagez votre expérience ou vos idées pour améliorer Oryalune.')}</p>
+      <p className="mb-8">{t('Partagez votre expérience ou vos idées pour améliorer Orialune.')}</p>
       {saved ? <section role="status" className="border border-gold/30 rounded-2xl p-6 space-y-5">
         <p>{t('Merci ! Votre message a bien été enregistré et sera lu par notre équipe.')}</p>
         <button onClick={() => { id.current = crypto.randomUUID(); setSaved(false); setMessage(''); setRating(''); }} className="rounded-lg bg-orchid px-5 py-3 font-semibold hover:bg-royal">{t('Écrire un autre message')}</button>

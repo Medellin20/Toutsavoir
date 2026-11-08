@@ -2,6 +2,7 @@ import { brand } from '../brand';
 import { Link } from 'react-router-dom';
 import { Baby, Eye, Star, Sparkles, Moon, Heart, Briefcase, Feather, ArrowRight } from 'lucide-react';
 import { testimonials, services } from '../data';
+import { serviceImages } from '../service-images';
 import { useLanguage } from '../contexts/LanguageContext';
 
 export function Home() {
@@ -68,7 +69,19 @@ export function Home() {
                 className="group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold flex flex-col bg-gradient-to-br from-royal/80 to-midnight/80 backdrop-blur-sm p-6 rounded-xl border border-gold/20 hover:border-gold/50 transition-all transform hover:scale-105 hover:shadow-xl hover:shadow-orchid/20 animate-fade-in-up"
                 style={{ animationDelay: `${Math.min(index, 6) * 0.15}s` }}
               >
-                <Icon aria-hidden="true" className="h-12 w-12 text-gold mb-4 transition-transform duration-300 group-hover:scale-110" />
+                <div className="relative -mx-6 -mt-6 mb-5 overflow-hidden rounded-t-xl bg-midnight aspect-[16/10]">
+                  <img
+                    src={serviceImages[service.id]}
+                    alt=""
+                    width={800}
+                    height={500}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none"
+                  />
+                  <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-midnight/70 to-transparent" />
+                  <Icon aria-hidden="true" className="absolute bottom-4 left-5 h-9 w-9 text-gold drop-shadow-lg" />
+                </div>
                 <h3 className="text-xl font-bold text-gold mb-2">{t(service.title)}</h3>
                 <p className="text-lavender whitespace-pre-line leading-relaxed mb-6">{t(service.description)}</p>
                 <span className="mt-auto inline-flex items-center gap-2 text-gold font-semibold">

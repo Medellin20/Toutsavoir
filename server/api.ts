@@ -140,7 +140,14 @@ export function createApi(store: Storage, options: { password: () => string | un
         }
         return json({ saved: true }, 201);
       }
-      if (path === '/profile' && request.method === 'GET') return json(await store.get<VoyantProfile>('profile') ?? defaultProfile);
+      if (path === '/profile' && request.method === 'GET') {
+        const profile = await store.get<VoyantProfile>('profile') ?? defaultProfile;
+        return json({
+          ...profile,
+          name: profile.name.replaceAll('Oryalune', 'Orialune'),
+          description: profile.description.replaceAll('Oryalune', 'Orialune'),
+        });
+      }
       if (path === '/consultations' && request.method === 'POST') {
         const entry = validateConsultation(await readBody());
         const key = `consultations/${entry.id}`;

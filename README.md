@@ -1,4 +1,4 @@
-# Oryalune
+# Orialune
 
 ## Démarrage local
 

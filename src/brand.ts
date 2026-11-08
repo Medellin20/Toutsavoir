@@ -1,3 +1,3 @@
 export const brand = {
-  name: 'Oryalune',
+  name: 'Orialune',
 } as const;

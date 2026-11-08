@@ -5,7 +5,7 @@
   <circle cx="600" cy="160" r="52" fill="#7B2CBF"/>
   <path d="M568 160q32-42 64 0-32 42-64 0Z" fill="none" stroke="#F8E9FF" stroke-width="4"/>
   <circle cx="600" cy="160" r="11" fill="#D4AF37"/>
-  <text x="600" y="325" text-anchor="middle" fill="#F8E9FF" font-family="Georgia,serif" font-size="100">Oryalune</text>
+  <text x="600" y="325" text-anchor="middle" fill="#F8E9FF" font-family="Georgia,serif" font-size="100">Orialune</text>
   <path d="M530 370h140" stroke="#D4AF37" stroke-width="2"/>
   <text x="600" y="435" text-anchor="middle" fill="#F8E9FF" font-family="Arial,sans-serif" font-size="32">Un espace pour éclairer votre chemin</text>
 </svg>
