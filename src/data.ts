@@ -50,13 +50,6 @@ export const testimonials: Testimonial[] = [
     "content": "C'était ma première expérience avec le tarot. Les explications étaient claires et j'ai pu poser toutes mes questions. J'en suis ressortie avec une vision plus structurée de ma situation."
   },
   {
-    "id": "7",
-    "author_name": "Patrick K.",
-    "location": "Cotonou, Bénin",
-    "service": "Avenir financier",
-    "content": "Je voulais savoir comment aborder une période d'incertitude dans mes affaires. La consultation m'a surtout permis de réfléchir aux décisions que je prenais trop rapidement."
-  },
-  {
     "id": "8",
     "author_name": "Laura T.",
     "location": "Genève, Suisse",
@@ -78,13 +71,6 @@ export const testimonials: Testimonial[] = [
     "content": "J'ai demandé une lecture de mon thème astrologique. Certaines interprétations m'ont amené à réfléchir à mes habitudes et à mes relations avec mon entourage."
   },
   {
-    "id": "11",
-    "author_name": "Clarisse A.",
-    "location": "Abidjan, Côte d'Ivoire",
-    "service": "Voyance sentimentale",
-    "content": "J'avais des doutes sur la sincérité de mon partenaire. Cet échange m'a encouragée à privilégier une discussion honnête plutôt que de rester dans les suppositions."
-  },
-  {
     "id": "12",
     "author_name": "Mélanie C.",
     "location": "Montpellier, France",
@@ -99,13 +85,6 @@ export const testimonials: Testimonial[] = [
     "content": "La consultation a pris en compte plusieurs aspects de ma vie. J'ai trouvé les interprétations intéressantes, même si je les considère comme des pistes de réflexion plutôt que des certitudes."
   },
   {
-    "id": "14",
-    "author_name": "Sandrine O.",
-    "location": "Porto-Novo, Bénin",
-    "service": "Voyance mariage",
-    "content": "Je me posais beaucoup de questions sur l'avenir de mon couple. Le dialogue m'a aidée à mieux comprendre mes attentes et les points sur lesquels nous devions travailler."
-  },
-  {
     "id": "15",
     "author_name": "Caroline G.",
     "location": "Strasbourg, France",
@@ -118,13 +97,6 @@ export const testimonials: Testimonial[] = [
     "location": "Lausanne, Suisse",
     "service": "Avenir financier",
     "content": "J'étais stressé à l'idée de lancer une petite activité. La séance m'a permis de mettre des mots sur mes craintes. J'ai ensuite travaillé sur un budget concret avec mes propres outils."
-  },
-  {
-    "id": "17",
-    "author_name": "Fatou N.",
-    "location": "Dakar, Sénégal",
-    "service": "Guidance spirituelle",
-    "content": "Je ressentais le besoin de faire le point sur ma vie. J'ai trouvé un espace d'échange calme, respectueux et sans pression. C'est ce que je recherchais."
   },
   {
     "id": "18",
@@ -155,32 +127,11 @@ export const testimonials: Testimonial[] = [
     "content": "Après plusieurs déceptions, j'avais du mal à envisager une nouvelle relation. J'ai apprécié le ton bienveillant et les questions qui m'ont aidée à définir ce que je souhaitais."
   },
   {
-    "id": "22",
-    "author_name": "Chantal W.",
-    "location": "Lomé, Togo",
-    "service": "Étude du Tao et destinée",
-    "content": "J'ai trouvé intéressant de découvrir une autre approche de la connaissance de soi. Les explications ont été données avec patience et j'ai pu demander des précisions."
-  },
-  {
     "id": "23",
     "author_name": "Olivier B.",
     "location": "Grenoble, France",
     "service": "Voyance carrière",
     "content": "Je me sentais bloqué dans mon évolution professionnelle. La consultation a été un moment de réflexion qui m'a poussé à revoir mes objectifs pour les prochains mois."
-  },
-  {
-    "id": "24",
-    "author_name": "Inès A.",
-    "location": "Casablanca, Maroc",
-    "service": "Tarot amoureux",
-    "content": "Le tirage a suscité des questions auxquelles je n'avais pas vraiment réfléchi. J'ai apprécié qu'on m'explique les symboles sans me promettre un résultat précis."
-  },
-  {
-    "id": "25",
-    "author_name": "Rose K.",
-    "location": "Cotonou, Bénin",
-    "service": "Guidance spirituelle",
-    "content": "J'étais curieuse de découvrir ce type de consultation. J'ai trouvé l'expérience enrichissante et les échanges respectueux de mes convictions personnelles."
   },
   {
     "id": "26",
