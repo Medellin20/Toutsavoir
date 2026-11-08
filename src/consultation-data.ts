@@ -135,3 +135,9 @@ export const closingQuestions: Question[] = [
   { id: 'expectations', label: 'Qu’attendez-vous de cette consultation ?', options: ['Des réponses', 'Du réconfort', 'Une orientation', 'Autre'] },
   { id: 'additional', label: 'Y a-t-il une question que vous n’avez pas osé poser ou un point à approfondir ?' },
 ];
+
+export const reservationQuestions: Question[] = [
+  { id: 'preferredDate', label: 'Date souhaitée (facultatif)' },
+  { id: 'preferredTime', label: 'Horaire souhaité (facultatif)' },
+  { id: 'preferredDuration', label: 'Durée souhaitée (facultatif)' },
+];

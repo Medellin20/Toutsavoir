@@ -13,7 +13,8 @@ export function Contact() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-midnight to-royal py-12 sm:py-16 px-4">
       <div className="max-w-3xl mx-auto">
-        {location.state?.consultationSaved && <div role="status" className="mb-8 rounded-xl border border-gold/40 bg-royal/50 p-5 flex gap-3"><CheckCircle aria-hidden="true" className="text-gold shrink-0" /><div><p className="font-bold text-gold">{t(location.state?.booking ? 'Réservation confirmée !' : 'Demande enregistrée !')}</p>{location.state?.booking && <p className="my-2 text-gold">{formatBooking(location.state.booking)}</p>}<p>{t('Votre questionnaire a été transmis. Contactez maintenant votre voyante pour poursuivre.')}</p></div></div>}
+        {location.state?.consultationSaved && <div role="status" className="mb-8 rounded-xl border border-gold/40 bg-royal/50 p-5 flex gap-3"><CheckCircle aria-hidden="true" className="text-gold shrink-0" /><div><p className="font-bold text-gold">{t(location.state?.booking ? 'Réservation confirmée !' : 'Demande enregistrée !')}</p>{location.state?.booking && <p className="my-2 text-gold">{formatBooking(location.state.booking)}</p>}<p>{t('Votre demande a été transmise à la voyante. Vous pouvez la contacter pour échanger sur votre consultation.')}</p></div></div>}
+        {location.state?.slotOccupied && <p role="alert" className="slot-notice mb-6 rounded-xl border border-gold/50 p-5">{t('Votre demande est enregistrée. Le créneau souhaité est déjà pris ou demandé : contactez la voyante pour convenir d’un autre horaire.')}</p>}
         <div className="text-center mb-10">
           <Sparkles aria-hidden="true" className="h-12 w-12 text-gold mx-auto mb-4" />
           <h1 className="text-3xl sm:text-5xl font-bold text-gold mb-4">{t('Votre voyante')}</h1>

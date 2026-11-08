@@ -205,3 +205,30 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Ambient movement stays behind the content and never captures clicks. */
+.ambient-lights { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
+.ambient-lights span { position: absolute; width: 34rem; height: 34rem; border-radius: 50%; background: radial-gradient(circle, rgba(173, 86, 210, .09), transparent 65%); animation: ambient-drift 22s ease-in-out infinite alternate; }
+.ambient-lights span:nth-child(1) { top: -15rem; left: -12rem; }
+.ambient-lights span:nth-child(2) { right: -16rem; top: 35%; animation-delay: -8s; background: radial-gradient(circle, rgba(212, 175, 55, .07), transparent 65%); }
+.ambient-lights span:nth-child(3) { bottom: -22rem; left: 30%; animation-delay: -15s; }
+@keyframes ambient-drift { to { transform: translate(5vw, 9vh) scale(1.18); } }
+.motion-reveal { opacity: 0; translate: 0 22px; transition: opacity .65s ease, translate .65s cubic-bezier(.2,.7,.2,1); }
+.motion-reveal.motion-visible { opacity: 1; translate: 0 0; }
+.slot-notice { animation: notice-in .35s ease-out; }
+@keyframes notice-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+button, input, select, textarea { transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+button:not(:disabled):active { transform: scale(.98); }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  main button:not(:disabled):hover { box-shadow: 0 6px 22px rgba(146, 77, 186, .17); }
+  #services a:hover svg:last-child { transform: translateX(4px); }
+  #services a svg { transition: transform .25s ease; }
+  nav a { position: relative; }
+  nav a::after { content: ''; position: absolute; bottom: -5px; inset-inline: 0; height: 1px; background: currentColor; transform: scaleX(0); transition: transform .25s ease; }
+  nav a:hover::after { transform: scaleX(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ambient-lights { display: none; }
+  .motion-reveal { opacity: 1; translate: none; }
+  *, *::before, *::after { transition-duration: .01ms !important; }
+}

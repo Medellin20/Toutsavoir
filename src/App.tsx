@@ -1,3 +1,4 @@
+import { SiteMotion } from './components/SiteMotion';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
@@ -25,6 +26,7 @@ function App() {
       <ProfileProvider>
       <BrowserRouter>
       <div className="min-h-screen flex flex-col">
+        <SiteMotion />
         <ScrollToPage />
         <Navbar />
         <main className="flex-grow">

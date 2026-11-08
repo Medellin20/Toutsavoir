@@ -1,7 +1,7 @@
-import { bookingDurations, defaultSchedule, scheduleSlots, overlaps, slotClaims, type BookingSchedule, type BookingSlot } from '../src/booking-data';
+import { bookingDurations, preferredSlot, defaultSchedule, scheduleSlots, overlaps, slotClaims, type BookingSchedule, type BookingSlot } from '../src/booking-data';
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { services } from '../src/data';
-import { commonQuestions, serviceQuestions, closingQuestions } from '../src/consultation-data';
+import { commonQuestions, serviceQuestions, closingQuestions, reservationQuestions } from '../src/consultation-data';
 import { defaultProfile, type ConsultationRecord, type FeedbackRecord, type VoyantProfile } from '../src/platform-types';
 
 export interface Storage {
@@ -44,6 +44,9 @@ function validateConsultation(data: Record<string, unknown>): ConsultationRecord
     if (answer && question.options && !question.options.includes(answer)) throw new HttpError(400, 'Réponse non reconnue.');
     answers[question.id] = answer;
   }
+  for (const question of reservationQuestions) {
+    if (raw[question.id] !== undefined) answers[question.id] = requireText(raw[question.id], 500);
+  }
   const language = requireText(data.language, 2, true);
   if (!['fr','nl','en','es','it','de','pt','ar','pl'].includes(language)) throw new HttpError(400, 'Langue invalide.');
   return { id, serviceId, language, answers, createdAt: new Date().toISOString() };
@@ -83,6 +86,24 @@ export function createApi(store: Storage, options: { password: () => string | un
       };
       const getSchedule = async () => await store.get<BookingSchedule>('booking-schedule') ?? defaultSchedule;
       const getBookings = async () => (await Promise.all((await store.list('bookings/')).map(key => store.get<ConsultationRecord>(key)))).filter((item): item is ConsultationRecord => !!item);
+      const checkPreference = async (answers: Record<string, string>, excludeId?: string) => {
+        const slot = preferredSlot(answers);
+        if (!slot) return { checked: false, occupied: false };
+        const keys = [...await store.list('bookings/'), ...await store.list('consultations/')];
+        const records = await Promise.all(keys.map(key => store.get<ConsultationRecord>(key)));
+        const occupied = records.some(record => {
+          if (!record || record.id === excludeId) return false;
+          const other = record.booking ?? preferredSlot(record.answers);
+          return other ? overlaps(slot, other) : false;
+        });
+        return { checked: true, occupied };
+      };
+      if (path === '/slot-check' && request.method === 'POST') {
+        const body = await readBody();
+        const answers: Record<string, string> = {};
+        for (const field of ['preferredDate', 'preferredTime', 'preferredDuration']) answers[field] = requireText(body[field] ?? '', 500);
+        return json(await checkPreference(answers));
+      }
       if (path === '/availability' && request.method === 'GET') {
         const [schedule, bookings, locks] = await Promise.all([getSchedule(), getBookings(), store.list('booking-locks/')]);
         const occupied = new Set(locks);
@@ -126,8 +147,9 @@ export function createApi(store: Storage, options: { password: () => string | un
         // Stable client UUID makes retries overwrite the same request rather than create duplicates.
         const existing = await store.get<ConsultationRecord>(key);
         if (existing && (existing.serviceId !== entry.serviceId || JSON.stringify(existing.answers) !== JSON.stringify(entry.answers))) throw new HttpError(409, 'Cette demande existe déjà.');
+        const availability = await checkPreference(entry.answers, entry.id);
         await store.set(key, existing ?? entry);
-        return json({ saved: true }, 201);
+        return json({ saved: true, ...availability }, 201);
       }
       if (path === '/feedback' && request.method === 'POST') {
         const entry = validateFeedback(await readBody());

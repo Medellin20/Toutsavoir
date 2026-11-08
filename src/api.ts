@@ -14,5 +14,5 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
   if (!response.ok) throw new ApiError(response.status, data.error || 'La demande a échoué.');
   return data as T;
 }
-export const saveConsultation = (entry: Omit<ConsultationRecord, 'createdAt'>) => api<{ saved: boolean }>('/consultations', { method: 'POST', body: JSON.stringify(entry) });
+export const saveConsultation = (entry: Omit<ConsultationRecord, 'createdAt'>) => api<{ saved: boolean; checked: boolean; occupied: boolean }>('/consultations', { method: 'POST', body: JSON.stringify(entry) });
 export const getProfile = () => api<VoyantProfile>('/profile');

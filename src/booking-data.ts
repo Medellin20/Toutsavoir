@@ -27,3 +27,15 @@ export function slotClaims(slot: BookingSlot) {
   for (let time = Date.parse(slot.start); time < Date.parse(slot.start) + slot.duration * 60000; time += 60000) keys.push(`booking-locks/${time}`);
   return keys;
 }
+
+// A missing duration allows checking the chosen start time without imposing a duration.
+export function preferredSlot(answers: Record<string, string>): BookingSlot | null {
+  const date = answers.preferredDate ?? '';
+  const time = answers.preferredTime ?? '';
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) return null;
+  const start = Date.parse(`${date}T${time}:00+01:00`);
+  if (!Number.isFinite(start) || new Date(start + 3600000).toISOString().slice(0, 10) !== date) return null;
+  const match = (answers.preferredDuration ?? '').trim().match(/^(\d{1,4})(?:\s*(?:min|minutes?))?$/i);
+  const duration = match ? Number(match[1]) : 1;
+  return { start: new Date(start).toISOString(), duration: duration > 0 ? duration : 1 };
+}

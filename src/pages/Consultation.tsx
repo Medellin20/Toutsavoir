@@ -1,10 +1,9 @@
-import { bookingDurations, formatBooking, type BookingSlot } from '../booking-data';
-import { api, ApiError } from '../api';
+import { api, saveConsultation } from '../api';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { services } from '../data';
-import { commonQuestions, serviceQuestions, closingQuestions } from '../consultation-data';
+import { commonQuestions, serviceQuestions, closingQuestions, reservationQuestions } from '../consultation-data';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const inputClass = 'w-full rounded-lg border border-gold/30 bg-midnight/60 px-4 py-3 text-lavender focus:outline-none focus:ring-2 focus:ring-gold';
@@ -27,22 +26,26 @@ function ConsultationForm({ service }: { service: (typeof services)[number] }) {
   const navigate = useNavigate();
   const requestId = useRef(crypto.randomUUID());
   const submitting = useRef(false);
-  const [duration, setDuration] = useState(30);
-  const [slots, setSlots] = useState<BookingSlot[]>([]);
-  const [slotStart, setSlotStart] = useState('');
-  const [loadingSlots, setLoadingSlots] = useState(true);
-  const [slotsError, setSlotsError] = useState('');
-  const [reload, setReload] = useState(0);
-  useEffect(() => {
-    let active = true;
-    setLoadingSlots(true); setSlotsError('');
-    api<BookingSlot[]>('/availability').then(value => { if (active) setSlots(value); })
-      .catch(caught => { if (active) setSlotsError(caught instanceof Error ? caught.message : 'Chargement impossible.'); })
-      .finally(() => { if (active) setLoadingSlots(false); });
-    return () => { active = false; };
-  }, [reload]);
-  const booking = slots.find(slot => slot.start === slotStart && slot.duration === duration);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [availability, setAvailability] = useState<'idle' | 'checking' | 'occupied' | 'clear' | 'error'>('idle');
+  const preferredDate = answers.preferredDate ?? '';
+  const preferredTime = answers.preferredTime ?? '';
+  const preferredDuration = answers.preferredDuration ?? '';
+  useEffect(() => {
+    if (!preferredDate || !preferredTime) { setAvailability('idle'); return; }
+    let active = true;
+    setAvailability('checking');
+    const check = async () => {
+      setAvailability('checking');
+      try {
+        const result = await api<{ checked: boolean; occupied: boolean }>('/slot-check', { method: 'POST', body: JSON.stringify({ preferredDate, preferredTime, preferredDuration }) });
+        if (active) setAvailability(!result.checked ? 'idle' : result.occupied ? 'occupied' : 'clear');
+      } catch { if (active) setAvailability('error'); }
+    };
+    const timeout = window.setTimeout(() => void check(), 400);
+    const interval = window.setInterval(() => void check(), 30000);
+    return () => { active = false; clearTimeout(timeout); clearInterval(interval); };
+  }, [preferredDate, preferredTime, preferredDuration]);
   const [review, setReview] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -55,11 +58,10 @@ function ConsultationForm({ service }: { service: (typeof services)[number] }) {
     { id: 'email', label: 'Email', type: 'email', autoComplete: 'email' },
   ];
   const update = (id: string, value: string) => setAnswers((previous) => ({ ...previous, [id]: value }));
-  const fields = [...identity, ...questions];
+  const fields = [...reservationQuestions, ...identity, ...questions];
 
   function showReview(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!booking) return;
     setReview(true);
     requestAnimationFrame(() => heading.current?.focus());
   }
@@ -70,12 +72,10 @@ function ConsultationForm({ service }: { service: (typeof services)[number] }) {
     setSaving(true);
     setError('');
     try {
-      if (!booking) throw new Error('Choisissez un créneau disponible.');
-      const result = await api<{ saved: boolean }>('/bookings', { method: 'POST', body: JSON.stringify({ id: requestId.current, serviceId: service.id, language, answers, booking }) });
+      const result = await saveConsultation({ id: requestId.current, serviceId: service.id, language, answers });
       if (!result.saved) throw new Error('L’enregistrement n’a pas été confirmé. Veuillez réessayer.');
-      navigate('/contact', { replace: true, state: { consultationSaved: true, booking } });
+      navigate('/contact', { replace: true, state: { consultationSaved: true, slotOccupied: result.occupied } });
     } catch (caught) {
-      if (caught instanceof ApiError && (caught.status === 409 || caught.status === 400)) { setReview(false); setSlotStart(''); setReload(value => value + 1); }
       setError(caught instanceof Error ? caught.message : 'Impossible d’enregistrer la demande. Veuillez réessayer.');
     } finally { submitting.current = false; setSaving(false); }
   }
@@ -93,17 +93,17 @@ function ConsultationForm({ service }: { service: (typeof services)[number] }) {
         {review ? (
           <section aria-label={t('Récapitulatif')} className="bg-midnight/50 border border-gold/20 p-5 sm:p-8 rounded-2xl">
             <h2 className="text-2xl font-bold text-gold mb-6">{t('Vérifiez vos réponses')}</h2>
-            <p className="text-gold mb-6">{booking && formatBooking(booking)}</p>
+            {availability === 'occupied' && <p role="status" className="slot-notice mb-6 rounded-xl border border-gold/60 bg-gold/10 p-4">{t('Ce créneau est déjà pris ou demandé. Vous pouvez modifier votre horaire ou envoyer votre demande pour en discuter avec la voyante.')}</p>}
             <dl className="space-y-5">
               {fields.filter((field) => answers[field.id]?.trim()).map((field) => (
                 <div key={field.id}><dt className="text-gold font-semibold mb-1">{t(field.label)}</dt><dd className="text-lavender whitespace-pre-wrap break-words">{t(answers[field.id])}</dd></div>
               ))}
             </dl>
-            <p className="text-sm text-lavender my-6">{t('Votre créneau sera réservé après confirmation. Vous pourrez ensuite contacter votre voyante.')}</p>
+            <p className="text-sm text-lavender my-6">{t('Votre demande sera enregistrée et transmise à la voyante avec vos préférences.')}</p>
             {error && <p role="alert" className="border border-gold/50 rounded-lg p-4 my-4">{t(error)}</p>}
             <div className="flex flex-col sm:flex-row gap-3">
               <button type="button" disabled={saving} onClick={() => setReview(false)} className="border border-gold/40 rounded-lg px-5 py-3 text-lavender disabled:opacity-50">{t('Modifier mes réponses')}</button>
-              <button type="button" disabled={saving} onClick={() => void submit()} className="inline-flex justify-center items-center gap-2 rounded-lg bg-orchid text-lavender font-bold px-5 py-3 hover:bg-royal disabled:opacity-50"><Check aria-hidden="true" className="h-5 w-5" />{t(saving ? 'Enregistrement...' : 'Confirmer ma réservation')}</button>
+              <button type="button" disabled={saving} onClick={() => void submit()} className="inline-flex justify-center items-center gap-2 rounded-lg bg-orchid text-lavender font-bold px-5 py-3 hover:bg-royal disabled:opacity-50"><Check aria-hidden="true" className="h-5 w-5" />{t(saving ? 'Enregistrement...' : 'Envoyer ma demande')}</button>
             </div>
           </section>
         ) : (
@@ -112,9 +112,14 @@ function ConsultationForm({ service }: { service: (typeof services)[number] }) {
             <fieldset className="space-y-5">
               <legend className="text-xl font-semibold text-gold mb-5">{t('Votre réservation')}</legend>
               <label className="block">{t('Choix du service')}<select className={`${inputClass} mt-2`} value={service.id} onChange={event => navigate(`/consultation/${event.target.value}`)}>{services.map(item => <option key={item.id} value={item.id}>{t(item.title)}</option>)}</select></label>
-              <label className="block">{t('Durée de consultation')}<select className={`${inputClass} mt-2`} value={duration} onChange={event => { setDuration(Number(event.target.value)); setSlotStart(''); }}>{bookingDurations.map(value => <option key={value} value={value}>{value} min</option>)}</select></label>
-              {loadingSlots ? <p role="status">{t('Chargement...')}</p> : slotsError ? <p role="alert">{slotsError}</p> : <label className="block">{t('Créneau disponible')} *<select required className={`${inputClass} mt-2`} value={slotStart} onChange={event => setSlotStart(event.target.value)}><option value="">{t('Sélectionnez un créneau')}</option>{slots.filter(slot => slot.duration === duration).map(slot => <option key={slot.start} value={slot.start}>{formatBooking(slot)}</option>)}</select>{!slots.some(slot => slot.duration === duration) && <span className="block mt-3">{t('Aucun créneau disponible pour cette durée. Essayez une autre durée ou contactez la voyante.')}</span>}</label>}
-              <button type="button" className="text-gold underline" disabled={loadingSlots} onClick={() => { setSlotStart(''); setReload(value => value + 1); }}>{t('Actualiser les disponibilités')}</button>
+              <p className="text-sm text-lavender">{t('Indiquez vos préférences si vous le souhaitez, ou laissez ces champs vides.')}</p>
+              {reservationQuestions.map(question => <label key={question.id} htmlFor={question.id} className="block">{t(question.label)}<input id={question.id} name={question.id} type={question.id === 'preferredDate' ? 'date' : question.id === 'preferredTime' ? 'time' : 'text'} placeholder={question.id === 'preferredDuration' ? t('Ex. 45 minutes') : undefined} maxLength={500} value={answers[question.id] ?? ''} onChange={event => update(question.id, event.target.value)} className={`${inputClass} mt-2`} /></label>)}
+              <div aria-live="polite" aria-atomic="true">
+                {availability === 'checking' && <p className="text-sm animate-pulse">{t('Vérification du créneau…')}</p>}
+                {availability === 'occupied' && <p className="slot-notice rounded-xl border border-gold/60 bg-gold/10 p-4">{t('Ce créneau est déjà pris ou demandé. Vous pouvez choisir un autre horaire ou transmettre votre demande à la voyante pour en discuter.')}</p>}
+                {availability === 'clear' && <p className="text-sm text-gold">{t('Aucun conflit détecté pour le moment. L’horaire reste à confirmer avec la voyante.')}</p>}
+                {availability === 'error' && <p className="text-sm">{t('Vérification momentanément indisponible. Vous pouvez tout de même envoyer votre demande.')}</p>}
+              </div>
             </fieldset>
             <fieldset>
               <legend className="text-xl font-semibold text-gold mb-5">{t('Vos informations')}</legend>
@@ -143,7 +148,7 @@ function ConsultationForm({ service }: { service: (typeof services)[number] }) {
                 </div>
               ))}
             </fieldset>
-            <button type="submit" disabled={!booking || loadingSlots || !!slotsError} className="disabled:opacity-50 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-orchid text-lavender font-bold px-5 py-4 hover:bg-royal">{t('Vérifier mes réponses')}<ArrowRight aria-hidden="true" className="h-5 w-5 rtl:rotate-180" /></button>
+            <button type="submit" className="disabled:opacity-50 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-orchid text-lavender font-bold px-5 py-4 hover:bg-royal">{t('Vérifier mes réponses')}<ArrowRight aria-hidden="true" className="h-5 w-5 rtl:rotate-180" /></button>
           </form>
         )}
       </div>

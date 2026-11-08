@@ -112,7 +112,7 @@ test('tous les services et toutes les réponses restent lisibles après redémar
     for (const data of submitted) {
       const response = await handle(request('/consultations', 'POST', data));
       assert.equal(response.status, 201);
-      assert.deepEqual(await response.json(), { saved: true });
+      assert.deepEqual(await response.json(), { saved: true, checked: false, occupied: false });
     }
     const changed = { ...submitted[0], answers: { ...submitted[0].answers, reason: 'Modification' } };
     assert.equal((await handle(request('/consultations', 'POST', changed))).status, 409);
@@ -283,5 +283,57 @@ test('réservations : créneaux publiés, concurrence, reprise et accès adminis
     assert.equal((await handle(request('/bookings', 'POST', { ...entry(), booking: slots[1] }))).status, 400);
     const unpublished = { ...entry(), booking: { start: new Date(Date.now() + 40 * 86400000).toISOString(), duration: 30 } };
     assert.equal((await handle(request('/bookings', 'POST', unpublished))).status, 400);
+  } finally { await rm(directory, { recursive: true, force: true }); }
+});
+
+test('demandes libres : préférences facultatives enregistrées sans créneau imposé', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'oryalune-free-requests-'));
+  const password = randomBytes(24).toString('hex');
+  const store = localStore(directory);
+  const handle = createApi(store, { password: () => password, secure: false });
+  try {
+    await store.set('booking-schedule', { start: '09:00', end: '10:00', duration: 15, enabled: false });
+    const free = { ...entry(), answers: { ...entry().answers, preferredDate: 'Un dimanche, à convenir', preferredTime: 'Le soir après 21 h', preferredDuration: 'Environ 45 minutes' } };
+    assert.equal((await handle(request('/consultations', 'POST', free))).status, 201);
+    assert.equal((await handle(request('/consultations', 'POST', entry()))).status, 201);
+    assert.equal((await handle(request('/consultations', 'POST', free))).status, 201);
+    const login = await handle(request('/admin/login', 'POST', { password }));
+    const cookie = login.headers.get('set-cookie')!.split(';')[0];
+    const records = await (await handle(request('/admin/consultations', 'GET', undefined, cookie))).json() as ConsultationRecord[];
+    assert.equal(records.length, 2);
+    const saved = records.find(record => record.id === free.id)!;
+    for (const key of ['preferredDate', 'preferredTime', 'preferredDuration'] as const) assert.equal(saved.answers[key], free.answers[key]);
+    assert.equal(saved.booking, undefined);
+    assert.deepEqual(await store.list('booking-locks/'), []);
+  } finally { await rm(directory, { recursive: true, force: true }); }
+});
+
+test('alerte automatique : chevauchements, confidentialité et demande toujours enregistrée', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'oryalune-slot-check-'));
+  const password = randomBytes(24).toString('hex');
+  const handle = createApi(localStore(directory), { password: () => password, secure: false });
+  const check = async (preferences: Record<string, string>) => {
+    const response = await handle(request('/slot-check', 'POST', preferences));
+    assert.equal(response.status, 200);
+    return response.json();
+  };
+  try {
+    const preferences = { preferredDate: '2030-06-20', preferredTime: '14:00', preferredDuration: '45 minutes' };
+    assert.deepEqual(await check(preferences), { checked: true, occupied: false });
+    const first = { ...entry(), answers: { ...entry().answers, ...preferences } };
+    assert.deepEqual(await (await handle(request('/consultations', 'POST', first))).json(), { saved: true, checked: true, occupied: false });
+    assert.deepEqual(await check({ ...preferences, preferredTime: '14:30', preferredDuration: '20' }), { checked: true, occupied: true });
+    assert.deepEqual(await check({ ...preferences, preferredTime: '13:45', preferredDuration: '30' }), { checked: true, occupied: true });
+    assert.deepEqual(await check({ ...preferences, preferredTime: '14:45' }), { checked: true, occupied: false });
+    assert.deepEqual(await check({ preferredDate: preferences.preferredDate }), { checked: false, occupied: false });
+    const second = { ...entry(), answers: { ...entry().answers, ...preferences, preferredTime: '14:15' } };
+    const response = await handle(request('/consultations', 'POST', second));
+    assert.equal(response.status, 201);
+    assert.deepEqual(await response.json(), { saved: true, checked: true, occupied: true });
+    assert.deepEqual(await (await handle(request('/consultations', 'POST', first))).json(), { saved: true, checked: true, occupied: true });
+    const login = await handle(request('/admin/login', 'POST', { password }));
+    const cookie = login.headers.get('set-cookie')!.split(';')[0];
+    const records = await (await handle(request('/admin/consultations', 'GET', undefined, cookie))).json() as ConsultationRecord[];
+    assert.equal(records.length, 2);
   } finally { await rm(directory, { recursive: true, force: true }); }
 });

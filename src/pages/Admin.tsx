@@ -1,4 +1,3 @@
-import { BookingAgenda } from '../components/BookingAgenda';
 import { formatBooking } from '../booking-data';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Lock, LogOut, RefreshCw, Save, Inbox } from 'lucide-react';
@@ -6,7 +5,7 @@ import { api, ApiError } from '../api';
 import { useProfile } from '../contexts/ProfileContext';
 import { defaultProfile, type ConsultationRecord, type FeedbackRecord, type VoyantProfile } from '../platform-types';
 import { services } from '../data';
-import { commonQuestions, serviceQuestions, closingQuestions } from '../consultation-data';
+import { commonQuestions, serviceQuestions, closingQuestions, reservationQuestions } from '../consultation-data';
 
 const inputClass = 'w-full rounded-lg border border-gold/30 bg-midnight p-3 text-lavender focus:outline-none focus:ring-2 focus:ring-gold';
 const buttonClass = 'inline-flex items-center justify-center gap-2 rounded-lg bg-orchid px-5 py-3 font-semibold hover:bg-royal disabled:opacity-50';
@@ -27,7 +26,7 @@ export function Admin() {
   const [profileDraft, setProfileDraft] = useState(defaultProfile);
   const [selected, setSelected] = useState<string | null>(null);
   const [search, setSearch] = useState('');
-  const [tab, setTab] = useState<'requests' | 'profile' | 'feedback' | 'agenda'>('requests');
+  const [tab, setTab] = useState<'requests' | 'profile' | 'feedback'>('requests');
   const [visibleCount, setVisibleCount] = useState(20);
 
   useEffect(() => {
@@ -85,7 +84,7 @@ export function Admin() {
   const current = entries.find(entry => entry.id === selected);
   const labels = current ? Object.fromEntries([
     ['lastName', 'Nom'], ['firstName', 'Prénom'], ['age', 'Âge'], ['email', 'E-mail'],
-    ...[...commonQuestions, ...(serviceQuestions[current.serviceId] ?? []), ...closingQuestions].map(question => [question.id, question.label]),
+    ...[...reservationQuestions, ...commonQuestions, ...(serviceQuestions[current.serviceId] ?? []), ...closingQuestions].map(question => [question.id, question.label]),
   ]) : {};
 
   return (
@@ -108,12 +107,11 @@ export function Admin() {
         ) : (
           <>
             <nav aria-label="Sections de l’administration" className="flex flex-wrap gap-3 mb-8">
-              <button onClick={() => setTab('agenda')} aria-pressed={tab === 'agenda'} className={buttonClass}>Disponibilités</button>
               <button onClick={() => { setTab('requests'); setNotice(''); }} aria-pressed={tab === 'requests'} className={`${buttonClass} ${tab === 'requests' ? 'ring-1 ring-gold' : ''}`}><Inbox className="w-4 h-4" aria-hidden="true" />Demandes ({entries.length})</button>
               <button onClick={() => { setTab('profile'); setNotice(''); }} aria-pressed={tab === 'profile'} className={`${buttonClass} ${tab === 'profile' ? 'ring-1 ring-gold' : ''}`}>Coordonnées de la voyante</button>
               <button onClick={() => { setTab('feedback'); setNotice(''); }} aria-pressed={tab === 'feedback'} className={`${buttonClass} ${tab === 'feedback' ? 'ring-1 ring-gold' : ''}`}>Avis et suggestions ({feedback.length})</button>
             </nav>
-            {tab === 'agenda' ? <BookingAgenda /> : tab === 'feedback' ? (
+            {tab === 'feedback' ? (
               <section aria-label="Avis et suggestions" className="space-y-5">
                 <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-2xl text-gold font-semibold">Avis et suggestions</h2><button onClick={() => void refresh()} disabled={busy} className={buttonClass}><RefreshCw className="w-4 h-4" aria-hidden="true" />Actualiser</button></div>
                 {!feedback.length && <p>Aucun message pour le moment.</p>}
