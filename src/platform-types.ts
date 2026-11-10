@@ -19,7 +19,7 @@ export const defaultProfile: VoyantProfile = {
   description: 'Une seule voyante vous accompagne pour tous les services Orialune.',
   phone: '',
   whatsapp: '',
-  email: 'kartersteven215@gmail.com',
+  email: 'contacts@orialune.space',
   hours: '',
 };
 

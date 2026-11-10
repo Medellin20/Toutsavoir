@@ -144,6 +144,7 @@ export function createApi(store: Storage, options: { password: () => string | un
         const profile = await store.get<VoyantProfile>('profile') ?? defaultProfile;
         return json({
           ...profile,
+          email: profile.email === 'kartersteven215@gmail.com' ? defaultProfile.email : profile.email,
           name: profile.name.replaceAll('Oryalune', 'Orialune'),
           description: profile.description.replaceAll('Oryalune', 'Orialune'),
         });
