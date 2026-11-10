@@ -11,7 +11,7 @@ export function Footer() {
   return (
     <footer className="bg-midnight border-t border-gold/20 text-lavender animate-fade-in">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <Eye className="h-8 w-8 text-gold animate-glow" />
@@ -46,13 +46,14 @@ export function Footer() {
             </ul>
           </div>
 
-          <div>
-            <h3 className="font-semibold text-gold mb-4">{t('Services')}</h3>
-            <ul className="space-y-2 text-sm">
+          <div className="order-last sm:col-span-2 lg:col-span-3 border-t border-gold/15 pt-8">
+            <h3 className="font-semibold text-gold mb-5">{t('Services')}</h3>
+            <ul className="grid grid-cols-1 min-[420px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-1 text-sm">
               {services.map((service) => (
                 <li key={service.id}>
-                  <Link to={`/consultation/${service.id}`} className="hover:text-gold transition-colors">
-                    {t(service.title)}
+                  <Link to={`/consultation/${service.id}`} className="group flex h-full items-start gap-3 rounded-lg px-3 py-2.5 leading-relaxed text-lavender/80 transition-colors hover:bg-gold/5 hover:text-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold">
+                    <span aria-hidden="true" className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gold/50 group-hover:bg-gold" />
+                    <span>{t(service.title)}</span>
                   </Link>
                 </li>
               ))}
@@ -66,7 +67,6 @@ export function Footer() {
               {profile.email && <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-gold shrink-0" /><a className="break-all" href={`mailto:${profile.email}`}>{profile.email}</a></li>}
               {profile.phone && <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-gold shrink-0" /><a href={`tel:${profile.phone.replace(/[^+\d]/g, '')}`}>{profile.phone}</a></li>}
             </ul>}
-            <Link to="/admin" className="inline-block text-sm mt-4 hover:text-gold">{t('Espace admin')}</Link>
           </div>
         </div>
 
