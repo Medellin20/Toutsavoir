@@ -1,5 +1,5 @@
 import { formatBooking } from '../booking-data';
-import { MessageCircle, Mail, Phone, Clock, CheckCircle, Sparkles } from 'lucide-react';
+import { Mail, Clock, CheckCircle, Sparkles } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useProfile } from '../contexts/ProfileContext';
@@ -9,7 +9,6 @@ export function Contact() {
   const { t } = useLanguage();
   const { profile, loading, error, refresh } = useProfile();
   const location = useLocation();
-  const message = t('Bonjour {name}, je souhaiterais une consultation de voyance.').replace('{name}', profile.name);
   return (
     <div className="min-h-screen bg-gradient-to-br from-midnight to-royal py-12 sm:py-16 px-4">
       <div className="max-w-3xl mx-auto">
@@ -29,12 +28,10 @@ export function Contact() {
               {profile.hours && <p className="flex justify-center items-center gap-2 mt-4"><Clock className="w-4 h-4 text-gold" aria-hidden="true" />{profile.hours}</p>}
             </div>
             <div className="flex flex-wrap justify-center gap-2 my-8">{services.map(service => <span key={service.id} className="rounded-full border border-gold/20 px-3 py-2 text-sm">{t(service.title)}</span>)}</div>
-            <div className="grid sm:grid-cols-2 gap-3">
-              {profile.whatsapp && <a href={`https://wa.me/${profile.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer" className="flex justify-center items-center gap-2 rounded-lg bg-orchid hover:bg-royal p-4 font-semibold"><MessageCircle aria-hidden="true" />WhatsApp</a>}
-              {profile.phone && <a href={`tel:${profile.phone.replace(/[^+\d]/g, '')}`} className="flex justify-center items-center gap-2 rounded-lg border border-gold/40 p-4 font-semibold"><Phone aria-hidden="true" />{profile.phone}</a>}
-              {profile.email && <a href={`mailto:${profile.email}`} className="flex justify-center items-center gap-2 rounded-lg border border-gold/40 p-4 font-semibold sm:col-span-2 break-all"><Mail aria-hidden="true" className="shrink-0" />{profile.email}</a>}
+            <div className="grid gap-3">
+              {profile.email && <a href={`mailto:${profile.email}`} className="flex justify-center items-center gap-2 rounded-lg border border-gold/40 p-4 font-semibold break-all"><Mail aria-hidden="true" className="shrink-0" />{profile.email}</a>}
             </div>
-            {!profile.phone && !profile.whatsapp && !profile.email && <p className="text-center">{t('Les coordonnées seront bientôt disponibles.')}</p>}
+            {!profile.email && <p className="text-center">{t('Les coordonnées seront bientôt disponibles.')}</p>}
           </article>
         )}
         <Link to="/#services" className="inline-block mt-8 text-gold underline">{t('Nos Services')}</Link>

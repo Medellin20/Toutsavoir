@@ -1,6 +1,6 @@
 import { useProfile } from '../contexts/ProfileContext';
 import { brand } from '../brand';
-import { Eye, Mail, Phone } from 'lucide-react';
+import { Eye, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { services } from '../data';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -65,7 +65,6 @@ export function Footer() {
             {!error && <ul className="space-y-1 text-sm">
               <li className="text-gold font-semibold">{profile.name}</li>
               {profile.email && <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-gold shrink-0" /><a className="min-w-0 break-all py-2" href={`mailto:${profile.email}`}>{profile.email}</a></li>}
-              {profile.phone && <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-gold shrink-0" /><a className="min-w-0 break-words py-2" href={`tel:${profile.phone.replace(/[^+\d]/g, '')}`}>{profile.phone}</a></li>}
             </ul>}
           </div>
         </div>

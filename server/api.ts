@@ -26,7 +26,6 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 function validateProfile(data: Record<string, unknown>): VoyantProfile {
   const result = Object.fromEntries(Object.keys(defaultProfile).map(key => [key, requireText(data[key], key === 'description' ? 1000 : 254, key === 'name')])) as unknown as VoyantProfile;
   if (result.email && !emailPattern.test(result.email)) throw new HttpError(400, 'Adresse e-mail invalide.');
-  for (const value of [result.phone, result.whatsapp]) if (value && !/^\+[1-9][\d ()-]{5,24}$/.test(value)) throw new HttpError(400, 'Indiquez les numéros avec leur indicatif international (+...).');
   return result;
 }
 function validateConsultation(data: Record<string, unknown>): ConsultationRecord {

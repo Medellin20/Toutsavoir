@@ -9,7 +9,7 @@ import { commonQuestions, serviceQuestions, closingQuestions, reservationQuestio
 
 const inputClass = 'w-full rounded-lg border border-gold/30 bg-midnight p-3 text-lavender focus:outline-none focus:ring-2 focus:ring-gold';
 const buttonClass = 'inline-flex items-center justify-center gap-2 rounded-lg bg-orchid px-5 py-3 font-semibold hover:bg-royal disabled:opacity-50';
-const profileLabels: Record<keyof VoyantProfile, string> = { name: 'Nom de la voyante', description: 'Présentation', phone: 'Téléphone', whatsapp: 'WhatsApp', email: 'E-mail de contact', hours: 'Horaires' };
+const profileLabels: Record<keyof VoyantProfile, string> = { name: 'Nom de la voyante', description: 'Présentation', email: 'E-mail de contact', hours: 'Horaires' };
 const serviceName = (id: string) => services.find(service => service.id === id)?.title ?? id;
 const date = (value: string) => new Date(value).toLocaleString('fr-FR');
 
@@ -125,15 +125,14 @@ export function Admin() {
             ) : tab === 'profile' ? (
               <form onSubmit={saveProfile} className="max-w-2xl border border-gold/30 rounded-2xl p-5 sm:p-8 space-y-5">
                 <h2 className="text-2xl font-semibold text-gold">Une voyante, tous les services</h2>
-                <p className="text-sm">Ces coordonnées s’affichent sur la page contact et dans le pied de page. Les contacts laissés vides sont masqués.</p>
+                <p className="text-sm">L’adresse e-mail et les autres informations du profil s’affichent sur la page contact et dans le pied de page.</p>
                 {(Object.keys(profileLabels) as (keyof VoyantProfile)[]).map(key => (
                   <div key={key}>
                     <label htmlFor={`profile-${key}`} className="block mb-2">{profileLabels[key]}{key === 'name' ? ' *' : ''}</label>
                     {key === 'description' ? <textarea id={`profile-${key}`} maxLength={1000} rows={4} value={profileDraft[key]} onChange={event => setProfileDraft({ ...profileDraft, [key]: event.target.value })} className={inputClass} /> :
-                      <input id={`profile-${key}`} required={key === 'name'} type={key === 'email' ? 'email' : key === 'phone' || key === 'whatsapp' ? 'tel' : 'text'} maxLength={254} value={profileDraft[key]} onChange={event => setProfileDraft({ ...profileDraft, [key]: event.target.value })} className={inputClass} aria-describedby={key === 'phone' || key === 'whatsapp' ? 'phone-help' : undefined} />}
+                      <input id={`profile-${key}`} required={key === 'name'} type={key === 'email' ? 'email' : 'text'} maxLength={254} value={profileDraft[key]} onChange={event => setProfileDraft({ ...profileDraft, [key]: event.target.value })} className={inputClass} />}
                   </div>
                 ))}
-                <p id="phone-help" className="text-sm">Téléphone et WhatsApp : utilisez l’indicatif international, par exemple +33…</p>
                 <button disabled={busy} className={buttonClass}><Save className="w-4 h-4" aria-hidden="true" />{busy ? 'Enregistrement...' : 'Enregistrer les coordonnées'}</button>
               </form>
             ) : (
